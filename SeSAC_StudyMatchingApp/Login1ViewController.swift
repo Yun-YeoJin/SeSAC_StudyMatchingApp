@@ -9,6 +9,7 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import FirebaseAuth
 
 final class Login1ViewController: BaseViewController {
     
@@ -57,9 +58,29 @@ final class Login1ViewController: BaseViewController {
             .drive(mainView.getAuthButton.rx.backgroundColor)
             .disposed(by: disposeBag)
         
-        
+        output.getAuthTap
+            .withUnretained(self)
+            .subscribe { value in
+                self.verifyPhoneNumber("+82 10-6390-7469")
+            }
+            .disposed(by: disposeBag)
         
     }
+    
+    private func verifyPhoneNumber(_ phoneNumber: String) {
+        
+        PhoneAuthProvider.provider()
+            .verifyPhoneNumber(phoneNumber, uiDelegate: nil) { verificationID, error in
+                if let error = error {
+                    return
+                }
+                
+                UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
+            }
+        
+        Auth.auth().languageCode = "kr"
+    }
+    
     
     private func checkNumberValid(_ phoneNumber: String) -> Bool {
         return phoneNumber.count == 13 && phoneNumber.contains("010-")
