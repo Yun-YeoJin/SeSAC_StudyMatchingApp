@@ -12,9 +12,11 @@ import RxSwift
 
 final class Login1ViewController: BaseViewController {
     
-    let mainView = Login1View()
+    private let mainView = Login1View()
     
-    var disposeBag = DisposeBag()
+    private let viewModel = Login1ViewModel()
+    
+    private var disposeBag = DisposeBag()
     
     override func loadView() {
         self.view = mainView
@@ -32,34 +34,51 @@ final class Login1ViewController: BaseViewController {
         bind()
     }
     
-    func bind() {
+    private func bind() {
         
-        mainView.phoneNumber.rx.text.orEmpty
-            .changed
-            .bind { value in
+        let input = Login1ViewModel.Input(phoneNumText: mainView.phoneNumber.rx.text.orEmpty, getAuthTap: mainView.getAuthButton.rx.tap)
+        
+        let output = viewModel.transform(input: input)
+        
+        input.phoneNumText
+            .subscribe(onNext: { value in
                 self.mainView.phoneNumber.text = self.phoneNumberformat(with: "XXX-XXXX-XXXX", phone: value)
-            }
+            })
             .disposed(by: disposeBag)
         
+        output.phoneNumValid
+            .asDriver(onErrorJustReturn: false)
+            .drive(mainView.getAuthButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        output.phoneNumValid
+            .map{ $0 == true ? UIColor.green : UIColor.gray6 }
+            .asDriver(onErrorJustReturn: .gray6)
+            .drive(mainView.getAuthButton.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        
+        
+    }
+    
+    private func checkNumberValid(_ phoneNumber: String) -> Bool {
+        return phoneNumber.count == 13 && phoneNumber.contains("010-")
     }
     
     func phoneNumberformat(with mask: String, phone: String) -> String {
         
         let numbers = phone.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
         var result = ""
-        var index = numbers.startIndex // numbers iterator
+        var index = numbers.startIndex
 
-        // iterate over the mask characters until the iterator of numbers ends
         for ch in mask where index < numbers.endIndex {
             if ch == "X" {
-                // mask requires a number in this place, so take the next one
+               
                 result.append(numbers[index])
-
-                // move numbers iterator to the next index
                 index = numbers.index(after: index)
 
             } else {
-                result.append(ch) // just append a mask character
+                result.append(ch)
             }
         }
         return result
