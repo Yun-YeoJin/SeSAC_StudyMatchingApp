@@ -26,6 +26,8 @@ final class Login1ViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        checkSecondRun()
+        
         mainView.getAuthButton.rx.tap
             .withUnretained(self)
             .subscribe { vc, _ in
@@ -33,8 +35,22 @@ final class Login1ViewController: BaseViewController {
             }.disposed(by: disposeBag)
         
         bind()
+        
     }
     
+    private func checkSecondRun() {
+        
+        if UserDefaults.standard.bool(forKey: "SecondRun") == false {
+            
+            let vc = OnBoardingViewController()
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true, completion: nil)
+            
+        }
+        
+    }
+    
+
     private func bind() {
         
         let input = Login1ViewModel.Input(phoneNumText: mainView.phoneNumber.rx.text.orEmpty, getAuthTap: mainView.getAuthButton.rx.tap)
