@@ -31,8 +31,17 @@ final class OnBoardingViewController: BaseViewController {
             
             //pageControl 동그라미 갯수 몇 개 만들건지 설정
             mainView.pageControl.numberOfPages = 3
-            
         }
+        
+        mainView.startButton.addTarget(self, action: #selector(startButtonClicked), for: .touchUpInside)
+    
+        
+    }
+    
+    @objc func startButtonClicked() {
+        
+        self.dismiss(animated: true)
+        UserDefaults.standard.set(true, forKey: "SecondRun")
         
     }
     
