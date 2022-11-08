@@ -8,8 +8,12 @@
 import UIKit
 
 import Then
+import RxCocoa
+import RxSwift
 
 class BaseViewController: UIViewController {
+    
+    var disposebag = DisposeBag()
     
     let backBarButton = UIBarButtonItem().then {
         $0.image = UIImage(systemName: "arrow.left")
@@ -28,6 +32,14 @@ class BaseViewController: UIViewController {
     }
     
     func configureUI() {
+        
+        navigationItem.leftBarButtonItem = backBarButton
+        
+        backBarButton.target = self
+        backBarButton.rx.tap
+            .bind { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposebag)
         
     }
     
