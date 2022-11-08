@@ -27,13 +27,6 @@ final class Login1ViewController: BaseViewController {
         super.viewDidLoad()
         
         checkSecondRun()
-        
-        mainView.getAuthButton.rx.tap
-            .withUnretained(self)
-            .subscribe { vc, _ in
-                vc.navigationController?.pushViewController(Login2ViewController(), animated: true)
-            }.disposed(by: disposeBag)
-        
         bind()
         
     }
@@ -77,13 +70,24 @@ final class Login1ViewController: BaseViewController {
         output.getAuthTap
             .withUnretained(self)
             .subscribe { value in
-                self.verifyPhoneNumber("+82 10-6390-7469")
+                self.verifyPhoneNumber(self.mainView.phoneNumber.text!)
             }
             .disposed(by: disposeBag)
         
+        input.getAuthTap
+            .withUnretained(self)
+            .subscribe { vc, _ in
+                vc.navigationController?.pushViewController(Login2ViewController(), animated: true)
+            }.disposed(by: disposeBag)
+        
     }
     
-    private func verifyPhoneNumber(_ phoneNumber: String) {
+    private func verifyPhoneNumber(_ str: String) {
+        
+        let phoneNumber = "+82\(str)"
+        var newNumber = phoneNumber.components(separatedBy: ["-"]).joined()
+        newNumber.remove(at: newNumber.index(newNumber.startIndex, offsetBy: 3))
+        //print(newNumber)
         
         PhoneAuthProvider.provider()
             .verifyPhoneNumber(phoneNumber, uiDelegate: nil) { verificationID, error in
@@ -91,7 +95,7 @@ final class Login1ViewController: BaseViewController {
                     return
                 }
                 
-                UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
+                UserDefaults.standard.set(newNumber, forKey: "authVerificationID")
             }
         
         Auth.auth().languageCode = "kr"
@@ -102,7 +106,7 @@ final class Login1ViewController: BaseViewController {
         return phoneNumber.count == 13 && phoneNumber.contains("010-")
     }
     
-    func phoneNumberformat(with mask: String, phone: String) -> String {
+    private func phoneNumberformat(with mask: String, phone: String) -> String {
         
         let numbers = phone.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
         var result = ""
