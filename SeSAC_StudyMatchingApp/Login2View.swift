@@ -21,9 +21,10 @@ final class Login2View: BaseView {
     }
     
     let phoneNumber = UITextField().then {
-        $0.placeholder = "휴대폰 번호(-없이 숫자만 입력)"
+        $0.placeholder = "인증번호 입력"
         $0.font = .title4_R14
         $0.borderStyle = .none
+        $0.keyboardType = .numberPad
     }
     
     private let underlineView = UIView().then {
@@ -38,7 +39,7 @@ final class Login2View: BaseView {
     }
     
     let getAuthButton = UIButton().then {
-        $0.setTitle("인증 문자 받기", for: .normal)
+        $0.setTitle("인증하고 시작하기", for: .normal)
         $0.setTitleColor(.white, for: .normal)
         $0.backgroundColor = .gray3
         $0.layer.cornerRadius = 10

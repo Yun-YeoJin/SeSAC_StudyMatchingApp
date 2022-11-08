@@ -12,9 +12,11 @@ import RxSwift
 
 final class Login2ViewController: BaseViewController {
     
-    let mainView = Login2View()
+    private let mainView = Login2View()
     
-    var disposeBag = DisposeBag()
+    private let viewModel = Login2ViewModel()
+    
+    private var disposeBag = DisposeBag()
     
     override func loadView() {
         self.view = mainView
@@ -23,9 +25,38 @@ final class Login2ViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        bind()
+        
         
         
     }
+    
+    private func bind() {
+        
+        let input = Login2ViewModel.Input(phoneNumText: mainView.phoneNumber.rx.text.orEmpty, getAuthTap: mainView.getAuthButton.rx.tap)
+        
+        let output = viewModel.transform(input: input)
+        
+        output.phoneNumValid
+            .asDriver(onErrorJustReturn: false)
+            .drive(mainView.getAuthButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        output.phoneNumValid
+            .map { $0 == true ? UIColor.green : UIColor.gray6 }
+            .asDriver(onErrorJustReturn: .gray6)
+            .drive(mainView.getAuthButton.rx.backgroundColor)
+            .disposed(by: disposeBag)
+        
+        input.getAuthTap
+            .withUnretained(self)
+            .subscribe { vc, _ in
+                vc.navigationController?.pushViewController(NickNameViewController(), animated: true)
+            }.disposed(by: disposeBag)
+        
+        
+    }
+    
     
     override func configureUI() {
         
