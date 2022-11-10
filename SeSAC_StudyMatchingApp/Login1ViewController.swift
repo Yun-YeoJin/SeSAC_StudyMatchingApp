@@ -10,12 +10,13 @@ import UIKit
 import RxCocoa
 import RxSwift
 import FirebaseAuth
+import Toast
 
 final class Login1ViewController: BaseViewController {
     
-    private let mainView = Login1View()
+    let mainView = Login1View()
     
-    private let viewModel = Login1ViewModel()
+    let viewModel = Login1ViewModel()
     
     private var disposeBag = DisposeBag()
     
@@ -33,99 +34,66 @@ final class Login1ViewController: BaseViewController {
     
     private func checkSecondRun() {
         
-        if UserDefaults.standard.bool(forKey: "SecondRun") == false {
+        if  UserDefaultsRepository.fetchSecondRun() == false {
             
             let vc = OnBoardingViewController()
             vc.modalPresentationStyle = .fullScreen
             self.present(vc, animated: true, completion: nil)
             
         }
-        
     }
     
-
     private func bind() {
-        
-        let input = Login1ViewModel.Input(phoneNumText: mainView.phoneNumber.rx.text.orEmpty, getAuthTap: mainView.getAuthButton.rx.tap)
-        
-        let output = viewModel.transform(input: input)
-        
-        input.phoneNumText
-            .subscribe(onNext: { value in
-                self.mainView.phoneNumber.text = self.phoneNumberformat(with: "XXX-XXXX-XXXX", phone: value)
+
+        mainView.phoneNumber.rx.text
+            .orEmpty
+            .map(viewModel.setHyphen)
+            .bind(to: viewModel.phoneNumberObserver)
+            .disposed(by: disposeBag)
+
+        viewModel.phoneNumberObserver
+            .map(viewModel.checkValidate)
+            .bind(to: viewModel.isValid)
+            .disposed(by: disposeBag)
+
+        viewModel.isValid
+            .subscribe(onNext: { data in
+                if data {
+                    self.mainView.getAuthButton.backgroundColor = .green
+                } else {
+                    self.mainView.getAuthButton.backgroundColor = .gray6
+                }
             })
             .disposed(by: disposeBag)
-        
-        output.phoneNumValid
-            .asDriver(onErrorJustReturn: false)
-            .drive(mainView.getAuthButton.rx.isEnabled)
+
+        viewModel.phoneNumberObserver
+            .subscribe(onNext: { value in
+                self.mainView.phoneNumber.text = value
+            })
             .disposed(by: disposeBag)
-        
-        output.phoneNumValid
-            .map{ $0 == true ? UIColor.green : UIColor.gray6 }
-            .asDriver(onErrorJustReturn: .gray6)
-            .drive(mainView.getAuthButton.rx.backgroundColor)
-            .disposed(by: disposeBag)
-        
-        output.getAuthTap
-            .withUnretained(self)
-            .subscribe { value in
-                self.verifyPhoneNumber(self.mainView.phoneNumber.text!)
-            }
-            .disposed(by: disposeBag)
-        
-        input.getAuthTap
-            .withUnretained(self)
-            .subscribe { vc, _ in
-                vc.navigationController?.pushViewController(Login2ViewController(), animated: true)
-            }.disposed(by: disposeBag)
-        
-    }
-    
-    private func verifyPhoneNumber(_ str: String) {
-        
-        let phoneNumber = "+82\(str)"
-        var newNumber = phoneNumber.components(separatedBy: ["-"]).joined()
-        newNumber.remove(at: newNumber.index(newNumber.startIndex, offsetBy: 3))
-        //print(newNumber)
-        
-        PhoneAuthProvider.provider()
-            .verifyPhoneNumber(phoneNumber, uiDelegate: nil) { verificationID, error in
-                if let error = error {
-                    return
+
+        mainView.getAuthButton.rx.tap
+            .bind(onNext: { value in
+                if self.viewModel.isValid.value {
+                    self.view.makeToast("전화 번호 인증 시작", position: .top)
+                    // firebase 통신
+                    self.viewModel.verifyPhoneNumber { state in
+                        switch state {
+                        case .tooManyRequests:
+                            self.view.makeToast("과도한 인증 시도가 있었습니다. 나중에 다시 시도해 주세요.", position: .top)
+                        case .success:
+                            self.navigationController?.pushViewController(Login2ViewController(), animated: true)
+                        case .unknownError:
+                            self.view.makeToast("에러가 발생했습니다. 다시 시도해주세요.", position: .top)
+                        }
+                    }
+                } else {
+                    self.view.makeToast("잘못된 전화번호 형식입니다.", position: .top)
                 }
-                
-                UserDefaults.standard.set(newNumber, forKey: "authVerificationID")
-            }
-        
-        Auth.auth().languageCode = "kr"
+            })
+            .disposed(by: disposeBag)
     }
     
-    
-    private func checkNumberValid(_ phoneNumber: String) -> Bool {
-        return phoneNumber.count == 13 && phoneNumber.contains("010-")
-    }
-    
-    private func phoneNumberformat(with mask: String, phone: String) -> String {
-        
-        let numbers = phone.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
-        var result = ""
-        var index = numbers.startIndex
 
-        for ch in mask where index < numbers.endIndex {
-            if ch == "X" {
-               
-                result.append(numbers[index])
-                index = numbers.index(after: index)
-
-            } else {
-                result.append(ch)
-            }
-        }
-        return result
-        
-    }
-   
-    
 }
 
