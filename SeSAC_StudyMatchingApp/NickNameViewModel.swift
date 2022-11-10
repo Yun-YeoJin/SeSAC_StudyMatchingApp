@@ -10,25 +10,22 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-class NickNameViewModel: CommonViewModel {
+class NickNameViewModel {
     
-    struct Input {
-        let nickNameText: ControlProperty<String>
-        let nextTap: ControlEvent<Void>
-    }
+    let nickNameObserver = BehaviorRelay<String>(value: "")
     
-    struct Output {
-        let nickNameValid: Observable<Bool>
-        let nextTap: ControlEvent<Void>
-    }
+    let isValid = BehaviorRelay<Bool>(value: false)
     
-    func transform(input: Input) -> Output {
+    var nickName: CObservable<String> = CObservable("")
+    
+    func checkNickNameValid(_ text: String) -> Bool {
         
-        let nickNameValid = input.nickNameText
-            .map { $0.count > 0 && $0.count < 11 }
-            .share()
+        nickName.value = text
         
-        return Output(nickNameValid: nickNameValid, nextTap: input.nextTap)
+        if text.count > 10 || text.count < 1 {
+            return false
+        } else {
+            return true
+        }
     }
-    
 }

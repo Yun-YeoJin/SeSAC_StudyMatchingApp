@@ -18,6 +18,12 @@ final class NickNameViewController: BaseViewController {
     
     var disposeBag = DisposeBag()
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        disposeBag = DisposeBag()
+    }
+    
     override func loadView() {
         self.view = mainView
     }
@@ -37,33 +43,42 @@ final class NickNameViewController: BaseViewController {
         backBarButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
-            }.disposed(by: disposeBag)
+            }.disposed(by: disposebag)
         
     }
     
     private func bind() {
         
-        let input = NickNameViewModel.Input(nickNameText: mainView.nickNameTextField.rx.text.orEmpty, nextTap: mainView.nextButton.rx.tap)
-        
-        let output = viewModel.transform(input: input)
-        
-        output.nickNameValid
-            .asDriver(onErrorJustReturn: false)
-            .drive(mainView.nextButton.rx.isEnabled)
+        mainView.nickNameTextField.rx.text
+            .orEmpty
+            .bind(to: viewModel.nickNameObserver)
             .disposed(by: disposeBag)
         
-        output.nickNameValid
-            .map{ $0 == true ? UIColor.green : UIColor.gray6 }
-            .asDriver(onErrorJustReturn: .gray6)
-            .drive(mainView.nextButton.rx.backgroundColor)
+        viewModel.nickNameObserver
+            .map(viewModel.checkNickNameValid)
+            .bind(to: viewModel.isValid)
             .disposed(by: disposeBag)
         
-        input.nextTap
-            .withUnretained(self)
-            .subscribe { vc, _ in
-                vc.navigationController?.pushViewController(BirthViewController(), animated: true)
-            }.disposed(by: disposeBag)
-
+        viewModel.isValid
+            .subscribe(onNext: { data in
+                if data {
+                    self.mainView.nextButton.backgroundColor = .green
+                } else {
+                    self.mainView.nextButton.backgroundColor = .gray6
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        mainView.nextButton.rx.tap
+            .bind { value in
+                if self.viewModel.isValid.value {
+                    self.navigationController?.pushViewController(BirthViewController(), animated: true)
+                } else {
+                    self.view.makeToast("닉네임은 1자 이상 10자 이내만 가능합니다.", position: .top)
+                }
+            }
+            .disposed(by: disposeBag)
+        
     }
     
 }
