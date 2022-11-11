@@ -19,37 +19,19 @@ final class BirthView: BaseView {
         $0.textAlignment = .center
     }
     
-    let yearTextField = UITextField().then {
-        $0.placeholder = "1990"
-        $0.font = .title4_R14
-        $0.borderStyle = .none
+    let yearTextField = BirthCustomView().then {
+        $0.textField.placeholder = "1990"
+        $0.customLabel.text = "년"
     }
     
-    let yearLabel = UILabel().then {
-        $0.text = "년"
-        $0.font = .title2_R16
+    let monthTextField = BirthCustomView().then {
+        $0.textField.placeholder = "1"
+        $0.customLabel.text = "월"
     }
     
-    let monthTextField = UITextField().then {
-        $0.placeholder = "1"
-        $0.font = .title4_R14
-        $0.borderStyle = .none
-    }
-    
-    let monthLabel = UILabel().then {
-        $0.text = "월"
-        $0.font = .title2_R16
-    }
-    
-    let dayTextField = UITextField().then {
-        $0.placeholder = "1"
-        $0.font = .title4_R14
-        $0.borderStyle = .none
-    }
-    
-    let dayLabel = UILabel().then {
-        $0.text = "일"
-        $0.font = .title2_R16
+    let dayTextField = BirthCustomView().then {
+        $0.textField.placeholder = "1"
+        $0.customLabel.text = "일"
     }
     
     let stackView = UIStackView().then {
@@ -60,7 +42,6 @@ final class BirthView: BaseView {
     
     let nextButton = CustomButton().then {
         $0.setTitle("다음", for: .normal)
-        $0.setTitleColor(.white, for: .normal)
         $0.buttonState = .disable
     }
     
@@ -68,6 +49,7 @@ final class BirthView: BaseView {
         $0.preferredDatePickerStyle = .wheels
         $0.datePickerMode = .date
         $0.locale = Locale(identifier: "ko-KR")
+        $0.setValue(UIColor.gray4, forKey: "backgroundColor")
     }
     
     override init(frame: CGRect) {
@@ -78,11 +60,10 @@ final class BirthView: BaseView {
     
     override func configureUI() {
         
-        
         [birthText, stackView, nextButton, datePicker].forEach {
             self.addSubview($0)
             
-            [yearTextField, yearLabel, monthTextField, monthLabel, dayTextField, dayLabel].forEach {
+            [yearTextField, monthTextField, dayTextField].forEach {
                 self.stackView.addArrangedSubview($0)
             }
         }
