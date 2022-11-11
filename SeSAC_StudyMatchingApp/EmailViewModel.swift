@@ -10,31 +10,22 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-class EmailViewModel: CommonViewModel {
+class EmailViewModel {
     
-    struct Input {
-        let emailText: ControlProperty<String>
-        let nextTap: ControlEvent<Void>
+    let emailObserver = BehaviorRelay<String>(value: "")
+    
+    let isValid = BehaviorRelay<Bool>(value: false)
+    
+    var userEmail: CObservable<String> = CObservable("")
+    
+    
+    func checkValidEmail(_ email: String) -> Bool {
+        
+        userEmail.value = email
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: email)
     }
     
-    struct Output {
-        let emailValid: Observable<Bool>
-        let nextTap: ControlEvent<Void>
-    }
-    
-    func transform(input: Input) -> Output {
-        
-        let emailValid = input.emailText
-            .map(isValidEmail)
-            .share()
-        
-        return Output(emailValid: emailValid, nextTap: input.nextTap)
-        
-        func isValidEmail(_ email: String) -> Bool {
-            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-            let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-            return emailTest.evaluate(with: email)
-        }
-    }
     
 }

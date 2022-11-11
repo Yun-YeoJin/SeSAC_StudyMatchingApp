@@ -12,11 +12,11 @@ import RxSwift
 
 final class EmailViewController: BaseViewController {
     
-    private let mainView = EmailView()
+    let mainView = EmailView()
     
-    private let viewModel = EmailViewModel()
+    let viewModel = EmailViewModel()
     
-    private var disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     override func loadView() {
         self.view = mainView
@@ -29,30 +29,49 @@ final class EmailViewController: BaseViewController {
     }
     
     private func bind() {
-        
-        let input = EmailViewModel.Input(emailText: mainView.emailTextField.rx.text.orEmpty, nextTap: mainView.nextButton.rx.tap)
-        
-        let output = viewModel.transform(input: input)
-        
-        output.emailValid
-            .asDriver(onErrorJustReturn: false)
-            .drive(mainView.nextButton.rx.isEnabled)
+       
+        mainView.emailTextField.rx.text
+            .orEmpty
+            .bind(to: viewModel.emailObserver)
             .disposed(by: disposeBag)
         
-        output.emailValid
-            .map { $0 == true ? UIColor.green : UIColor.gray6 }
-            .asDriver(onErrorJustReturn: .gray6)
-            .drive(mainView.nextButton.rx.backgroundColor)
+        viewModel.emailObserver
+            .map(viewModel.checkValidEmail)
+            .bind(to: viewModel.isValid)
             .disposed(by: disposeBag)
         
-        input.nextTap
-            .withUnretained(self)
-            .subscribe { vc, _ in
-                vc.navigationController?.pushViewController(GenderViewController(), animated: true)
-            }.disposed(by: disposeBag)
+        viewModel.isValid
+            .subscribe { data in
+                if data {
+                    self.mainView.nextButton.buttonState = .fill
+                } else {
+                    self.mainView.nextButton.buttonState = .disable
+                }
+            }
+            .disposed(by: disposeBag)
         
+        mainView.nextButton.rx.tap
+            .bind { value in
+                if self.viewModel.isValid.value {
+                    self.navigationController?.pushViewController(GenderViewController(), animated: true)
+                    UserDefaultsRepository.saveEmail(email: self.mainView.emailTextField.text!)
+                    print(UserDefaults.standard.string(forKey: "email"))
+                } else {
+                    self.view.makeToast("이메일 형식이 올바르지 않습니다.", position: .top)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    override func configureUI() {
         
+        navigationItem.leftBarButtonItem = backBarButton
         
+        backBarButton.target = self
+        backBarButton.rx.tap
+            .bind { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposebag)
         
     }
     
