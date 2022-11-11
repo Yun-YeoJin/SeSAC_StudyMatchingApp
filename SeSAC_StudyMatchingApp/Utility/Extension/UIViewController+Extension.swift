@@ -13,6 +13,9 @@ extension UIViewController {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = dateFormat
+        dateFormatter.locale = Locale(identifier: Locale.current.identifier)
+        dateFormatter.timeZone = TimeZone(identifier: TimeZone.current.identifier)
+        
         return dateFormatter.string(from: date)
         
     }
@@ -21,10 +24,10 @@ extension UIViewController {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-        let new = dateFormatter.string(from: date)
-        print(new)
+        let newDate = dateFormatter.string(from: date)
+        print(newDate)
         
-        UserDefaultsRepository.saveBirth(birth: new)
+        UserDefaultsRepository.saveBirth(birth: newDate)
     }
     
 }
