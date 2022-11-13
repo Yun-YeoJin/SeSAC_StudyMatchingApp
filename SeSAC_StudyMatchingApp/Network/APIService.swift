@@ -44,16 +44,18 @@ class APIService {
         
         RxAlamofire.requestData(.get, Endpoint.login.url, parameters: nil, headers: headers)
             .subscribe{ (header, data) in
+                
                 let apiState = UserEnum(rawValue: header.statusCode)!
                 
                 let decodedData = try? JSONDecoder().decode(User.self, from: data)
-
+    
                 completion(decodedData, apiState)
             }
             .disposed(by: disposeBag)
     }
     
-    func register(phoneNum: String, FCMtoken: String, nickName: String, birth: Date, email: String, gender: Int, completion: @escaping (User?, UserEnum) -> Void) {
+    func register(phoneNum: String, FCMtoken: String, nickName: String, birth: String, email: String, gender: Int, completion: @escaping (User?, UserEnum) -> Void) {
+        
         let headers: HTTPHeaders = [
             "Content-Type": "application/x-www-form-urlencoded",
             "idtoken": UserDefaultsRepository.fetchUserIDToken()
@@ -89,11 +91,33 @@ class APIService {
             .subscribe{ (header, data) in
                 let apiState = UserEnum(rawValue: header.statusCode)!
                 let decodedData = try? JSONDecoder().decode(User.self, from: data)
-
+                
                 completion(decodedData, apiState)
             }
             .disposed(by: disposeBag)
     }
+    
+    func updateFCMToken(completion: @escaping (UserEnum) -> Void) {
+        
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/x-www-form-urlencoded",
+            "idtoken": UserDefaultsRepository.fetchUserIDToken()
+        ]
+        
+        let parameters: [String: Any] = [
+            "FCMtoken": UserDefaultsRepository.fetchFCMToken()
+        ]
+        
+        RxAlamofire.requestData(.put, Endpoint.updateFCMToken.url, parameters: parameters, headers: headers)
+            .subscribe{ (header, data) in
+                
+                let apiState = UserEnum(rawValue: header.statusCode)!
+                
+                completion(apiState)
+            }
+            .disposed(by: disposeBag)
+    }
+    
     
 }
 

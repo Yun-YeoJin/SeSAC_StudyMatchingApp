@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 enum Endpoint {
     case login, register
     case updateFCMToken
