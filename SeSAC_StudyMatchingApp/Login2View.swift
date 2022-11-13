@@ -31,6 +31,11 @@ final class Login2View: BaseView {
         $0.backgroundColor = .opaqueSeparator
     }
     
+    let timeLabel = UILabel().then {
+        $0.textColor = .green
+        $0.font = .title3_M14
+    }
+    
     let resendButton = UIButton().then {
         $0.setTitle("재전송", for: .normal)
         $0.setTitleColor(.white, for: .normal)
@@ -54,7 +59,7 @@ final class Login2View: BaseView {
     override func configureUI() {
         
         
-        [loginText, phoneNumber, underlineView, resendButton, getAuthButton].forEach {
+        [loginText, phoneNumber, underlineView, timeLabel, resendButton, getAuthButton].forEach {
             self.addSubview($0)
         }
     }
@@ -79,6 +84,13 @@ final class Login2View: BaseView {
             make.trailing.equalTo(resendButton.snp.leading).offset(-8)
             make.leading.equalToSuperview().inset(16)
             make.height.equalTo(1)
+        }
+        
+        timeLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(phoneNumber.snp.trailing).offset(0)
+            make.bottom.equalTo(phoneNumber.snp.bottom).offset(-14)
+            make.width.equalTo(37)
+            make.height.equalTo(22)
         }
         
         resendButton.snp.makeConstraints { make in
