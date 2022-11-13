@@ -28,9 +28,11 @@ class Login1ViewModel {
     func verifyPhoneNumber(completion: @escaping (PhoneNumberAuthStatus) -> Void) {
         
         let number = "+82\(phoneNum)"
+        var newNumber = number.components(separatedBy: ["-"]).joined()
+        newNumber.remove(at: newNumber.index(newNumber.startIndex, offsetBy: 3))
         
         PhoneAuthProvider.provider()
-            .verifyPhoneNumber(number, uiDelegate: nil) { verificationID, error in
+            .verifyPhoneNumber(newNumber, uiDelegate: nil) { verificationID, error in
                 
                 if let error = error {
                     let state = AuthErrorCode.Code(rawValue: error._code)
@@ -44,11 +46,12 @@ class Login1ViewModel {
                 }
                 
                 UserDefaultsRepository.saveAuthVerificationID(authVerificationID: verificationID!)
-                UserDefaultsRepository.savePhoneNumber(phoneNumber: number)
+                UserDefaultsRepository.savePhoneNumber(phoneNumber: newNumber)
                 
                 completion(.success)
             }
     }
+
     
     // MARK: - Methods
     func checkValidate(text: String) -> Bool {
