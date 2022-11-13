@@ -69,22 +69,8 @@ final class GenderView: BaseView {
                 self.buttonStackView.addArrangedSubview($0)
             }
         }
-        [maleButton, femaleButton].forEach { sender in
-            sender.addTarget(self, action: #selector(buttonClicked(_:)), for: .touchUpInside)
-        }
     }
-    
-    @objc func buttonClicked(_ sender: UIButton) {
-        
-        [maleButton, femaleButton].forEach { sender in
-            sender.isSelected = false
-            sender.backgroundColor = .systemBackground
-        }
-        sender.isSelected = true
-        sender.backgroundColor = .whiteGreen
-        
-    }
-    
+
     override func setConstraints() {
         
         topGenderLabel.snp.makeConstraints { make in
