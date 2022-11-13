@@ -9,6 +9,7 @@ import Foundation
 
 final class UserDefaultsRepository {
     
+    //MARK: Save
     static func checkSecondRun(check: Bool) {
         UserDefaults.standard.set(check, forKey: UserDefaultKey.secondRun)
     }
@@ -49,21 +50,48 @@ final class UserDefaultsRepository {
         UserDefaults.standard.set(gender, forKey: UserDefaultKey.gender)
     }
     
+    
+    //MARK: Fetch
     static func fetchSecondRun() -> Bool {
         return UserDefaults.standard.bool(forKey: UserDefaultKey.secondRun)
+    }
+    
+   
+    
+    static func fetchAuthVerificationID() -> String {
+        return UserDefaults.standard.string(forKey: UserDefaultKey.authVerificationID)!
+    }
+    
+    static func fetchCredentialIdForFirebase() -> String {
+        return UserDefaults.standard.string(forKey: UserDefaultKey.credentialId)!
+    }
+    
+    static func fetchFCMToken() -> String {
+        return UserDefaults.standard.string(forKey: UserDefaultKey.fcmToken)!
+    }
+    
+    static func fetchPhoneNumber() -> String {
+        return UserDefaults.standard.string(forKey: UserDefaultKey.phoneNumber)!
     }
 
     static func fetchUserNickname() -> String {
         return UserDefaults.standard.string(forKey: UserDefaultKey.nickname)!
     }
-
-    static func fetchCredentialIdForFirebase() -> String {
-        return UserDefaults.standard.string(forKey: UserDefaultKey.credentialId)!
+    
+    static func fetchUserBirth() -> String {
+        return UserDefaults.standard.string(forKey: UserDefaultKey.birth)!
+    }
+    
+    static func fetchUserEmail() -> String {
+        return UserDefaults.standard.string(forKey: UserDefaultKey.email)!
+    }
+    
+    static func fetchUserGender() -> Int {
+        return UserDefaults.standard.integer(forKey: UserDefaultKey.gender)
     }
 
     static func fetchUserIDToken() -> String {
         return UserDefaults.standard.string(forKey: UserDefaultKey.idToken)!
     }
 
-    
 }
