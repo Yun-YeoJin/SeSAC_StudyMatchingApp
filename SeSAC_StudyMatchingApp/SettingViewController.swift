@@ -18,13 +18,17 @@ final class SettingViewController: BaseViewController {
         self.view = mainView
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationController?.navigationBar.topItem?.title = "내정보"
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         mainView.tableView.delegate = self
         mainView.tableView.dataSource = self
-        
-        self.navigationController?.navigationBar.topItem?.title = "내정보"
         
     }
     
@@ -53,12 +57,22 @@ extension SettingViewController: UITableViewDelegate, UITableViewDataSource {
         
         guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "SettingHeaderView") as? SettingHeaderView else { return UIView() }
         
+        headerView.button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        
         return headerView
         
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 94
+    }
+    
+    @objc func buttonTapped() {
+        self.transition(MyInfoViewController(), transitionStyle: .push)
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
 }
