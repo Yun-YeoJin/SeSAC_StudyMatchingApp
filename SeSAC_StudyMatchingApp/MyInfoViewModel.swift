@@ -49,6 +49,36 @@ class MyInfoViewModel {
         }
     }
     
+    func withdrawUser(completion: @escaping (String, UserEnum) -> Void) {
+        APIService.shared.withdraw(completion: { data, code in
+            switch code {
+            case .success:
+                completion("", code)
+                UserDefaults.standard.removeObject(forKey: "idToken")
+                UserDefaults.standard.removeObject(forKey: "secondRun")
+                UserDefaults.standard.removeObject(forKey: "FCMtoken")
+                
+            case .firebaseTokenInvalid:
+                self.getFCMToken { message, code in
+                    switch code {
+                    case .success:
+                        completion("", code)
+                    default:
+                        completion(message, code)
+                    }
+                }
+            case .userUnexist:
+                completion("가입되지 않은 유저", code)
+            case .serverError:
+                completion("서버 에러", code)
+            case .clientError:
+                completion("사용자 에러 발생", code)
+                
+            default: completion("", code)
+            }
+        })
+    }
+    
     func getFCMToken(completion: @escaping (String, UserEnum) -> Void) {
         APIService.shared.updateFCMToken { status in
             switch status {
@@ -59,4 +89,6 @@ class MyInfoViewModel {
             }
         }
     }
+    
+    
 }
