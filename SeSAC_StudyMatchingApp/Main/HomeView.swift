@@ -17,19 +17,70 @@ final class HomeView: BaseView {
         $0.mapType = MKMapType.standard
         $0.showsUserLocation = true
         $0.setUserTrackingMode(.follow, animated: true)
+        $0.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 500, maxCenterCoordinateDistance: 30000)
+    }
+    
+    let genderButtonStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.distribution = .fillEqually
+        $0.layer.cornerRadius = 8
+        $0.clipsToBounds = true
+    }
+    
+    let searchAllButton = CustomButton().then {
+        $0.setTitle("전체", for: .normal)
+        $0.buttonState = .fill
+        $0.titleLabel?.font = .title3_M14
+        $0.layer.cornerRadius = 0
+    }
+    
+    let searchManButton = CustomButton().then {
+        $0.setTitle("남자", for: .normal)
+        $0.buttonState = .inactive
+        $0.titleLabel?.font = .title3_M14
+        $0.layer.cornerRadius = 0
+    }
+    
+    let searchWomanButton = CustomButton().then {
+        $0.setTitle("여자", for: .normal)
+        $0.buttonState = .inactive
+        $0.titleLabel?.font = .title3_M14
+        $0.layer.cornerRadius = 0
+    }
+    
+    let centerLocationView = UIImageView().then {
+        $0.image = UIImage(named: "map_marker")
+    }
+    
+    let floatingButton = UIButton().then {
+        $0.setImage(UIImage(named: "floatingButton_default"), for: .normal)
+        $0.clipsToBounds = true
+        $0.layer.cornerRadius = $0.frame.size.width / 2
+    }
+    
+    let myLocationButton = CustomButton().then {
+        $0.setImage(UIImage(named: "bt_gps"), for: .normal)
+        $0.backgroundColor = .white
+        $0.buttonState = .inactive
+        $0.clipsToBounds = true
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        
+        
     }
     
     override func configureUI() {
         
-        [mapKit].forEach {
+        [mapKit,genderButtonStackView, centerLocationView, floatingButton, myLocationButton].forEach {
             self.addSubview($0)
+            
+            [searchAllButton, searchManButton, searchWomanButton].forEach {
+                genderButtonStackView.addArrangedSubview($0)
+            }
         }
-        
     }
     
     override func setConstraints() {
@@ -38,6 +89,32 @@ final class HomeView: BaseView {
             make.top.leading.trailing.equalToSuperview()
             make.bottom.equalTo(self.safeAreaLayoutGuide)
         }
+    
+        floatingButton.snp.makeConstraints { make in
+            make.trailing.bottom.equalTo(self.safeAreaLayoutGuide).inset(16)
+            make.size.equalTo(64)
+        }
+        
+        genderButtonStackView.snp.makeConstraints { make in
+            make.top.leading.equalTo(self.safeAreaLayoutGuide).inset(16)
+        }
+        
+        searchManButton.snp.makeConstraints { make in
+            make.size.equalTo(48)
+        }
+        
+        myLocationButton.snp.makeConstraints { make in
+            make.top.equalTo(genderButtonStackView.snp.bottom).offset(16)
+            make.leading.equalTo(self.safeAreaLayoutGuide).inset(16)
+            make.size.equalTo(48)
+        }
+        
+        centerLocationView.snp.makeConstraints { make in
+            make.centerX.equalTo(mapKit)
+            make.centerY.equalTo(mapKit).offset(-24)
+            make.size.equalTo(48)
+        }
+        
         
     }
     
