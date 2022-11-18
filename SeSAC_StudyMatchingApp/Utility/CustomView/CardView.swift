@@ -230,7 +230,7 @@ final class CardView: BaseView {
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(sesacTitle.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview()
-            make.height.equalTo(120)
+            make.height.equalTo(130)
             make.bottom.equalToSuperview()
         }
         

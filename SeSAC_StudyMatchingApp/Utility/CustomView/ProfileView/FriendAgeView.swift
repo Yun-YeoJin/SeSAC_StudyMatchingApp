@@ -38,6 +38,7 @@ final class FriendAgeView: BaseView {
         $0.thumbImage = UIImage(named: "filter_control")
         $0.thumbCount = 2
         $0.thumbImage = UIImage(named: "filter_control")
+        $0.keepsDistanceBetweenThumbs = true
     }
         
     override init(frame: CGRect) {
@@ -77,7 +78,8 @@ final class FriendAgeView: BaseView {
         
         ageSlider.snp.makeConstraints { make in
             make.top.equalTo(ageLabel.snp.bottom).offset(12)
-            make.leading.bottom.trailing.equalToSuperview().inset(16)
+            make.leading.trailing.equalToSuperview().inset(8)
+            make.height.greaterThanOrEqualTo(42)
         }
         
     }

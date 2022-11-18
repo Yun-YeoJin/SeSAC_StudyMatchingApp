@@ -67,21 +67,21 @@ final class UserGenderView: BaseView {
         }
         
         stackView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
+            make.top.bottom.equalToSuperview().inset(8)
             make.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(48)
         }
         
         maleButton.snp.makeConstraints { make in
-            make.leading.top.bottom.equalToSuperview().inset(4)
+            make.leading.top.bottom.equalToSuperview()
             make.width.equalTo(56)
-            make.height.equalTo(48)
+            //make.height.equalTo(48)
         }
         
         femaleButton.snp.makeConstraints { make in
-            make.trailing.top.bottom.equalToSuperview().inset(4)
+            make.leading.equalTo(maleButton.snp.trailing).offset(8)
+            make.top.bottom.equalToSuperview()
             make.width.equalTo(56)
-            make.height.equalTo(48)
+            //make.height.equalTo(48)
         }
         
     }

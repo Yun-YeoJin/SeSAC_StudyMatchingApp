@@ -15,12 +15,13 @@ enum Button {
     case cancel
 }
 
-final class AlertView: BaseViewController {
+final class AlertView: UIViewController {
     
     let mainView = UIView().then {
         $0.backgroundColor = .systemBackground
         $0.layer.cornerRadius = 16
     }
+    
     let titleLabel = UILabel().then {
         $0.textColor = .label
         $0.font = .body1_M16
@@ -29,6 +30,7 @@ final class AlertView: BaseViewController {
         $0.backgroundColor = .clear
         $0.textAlignment = .center
     }
+    
     let subTitleLabel = UILabel().then {
         $0.textColor = .label
         $0.font = .title4_R14
@@ -63,9 +65,12 @@ final class AlertView: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureUI()
+        setConstraints()
+        
         view.backgroundColor = .black.withAlphaComponent(0.6)
         
-        doneButton.addTarget(self, action: #selector(doneButtonPressedClicked), for: .touchUpInside)
+        doneButton.addTarget(self, action: #selector(doneButtonClicked), for: .touchUpInside)
         cancelButton.addTarget(self, action: #selector(cancelButtonClicked), for: .touchUpInside)
     }
     
@@ -73,7 +78,7 @@ final class AlertView: BaseViewController {
         self.dismiss(animated: false, completion: nil)
     }
     
-    @objc func doneButtonPressedClicked(_ sender: UIButton) {
+    @objc func doneButtonClicked(_ sender: UIButton) {
         handler?()
     }
     
@@ -98,7 +103,7 @@ final class AlertView: BaseViewController {
             }
         }
     }
-    override func configureUI() {
+    func configureUI() {
         
         view.addSubview(mainView)
         
@@ -109,8 +114,7 @@ final class AlertView: BaseViewController {
         
     }
     
-    
-    override func setConstraints() {
+    func setConstraints() {
         
         mainView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -120,22 +124,19 @@ final class AlertView: BaseViewController {
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(10)
-            make.left.equalToSuperview().offset(10)
-            make.right.equalToSuperview().offset(-10)
+            make.top.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(30)
         }
         
         subTitleLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(10)
-            make.left.equalToSuperview().offset(10)
-            make.right.equalToSuperview().offset(-10)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         
         stackView.snp.makeConstraints { make in
             make.top.equalTo(subTitleLabel.snp.bottom).offset(10)
-            make.left.equalToSuperview().offset(20)
-            make.right.bottom.equalToSuperview().offset(-20)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.bottom.equalToSuperview().offset(-20)
         }
         
     }

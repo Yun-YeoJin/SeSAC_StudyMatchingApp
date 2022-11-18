@@ -45,7 +45,7 @@ final class FavoriteStudyView: BaseView {
         studyLabel.snp.makeConstraints { make in
             make.top.leading.bottom.equalToSuperview().inset(16)
             make.trailing.lessThanOrEqualTo(studyTextField.snp.leading).offset(20)
-            make.height.equalTo(44)
+            //make.height.equalTo(44)
         }
         
         studyTextField.snp.makeConstraints { make in
