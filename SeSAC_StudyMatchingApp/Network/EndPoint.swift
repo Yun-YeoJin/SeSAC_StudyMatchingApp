@@ -11,6 +11,10 @@ enum Endpoint {
     case login, register
     case updateFCMToken
     case withdraw
+    case userMyPage
+    case requestSearchUser, cancelSearchUser
+    case searchSeSAC
+    case checkUserQueueState
 }
 
 extension Endpoint {
@@ -23,6 +27,14 @@ extension Endpoint {
             return .makeEndpoint("/v1/user/withdraw")
         case .updateFCMToken:
             return .makeEndpoint("/v1/user/update_fcm_token")
+        case .userMyPage:
+            return .makeEndpoint(("/v1/user/mypage"))
+        case .requestSearchUser, .cancelSearchUser:
+            return .makeEndpoint("/v1/queue")
+        case .searchSeSAC:
+            return .makeEndpoint("/v1/queue/search")
+        case .checkUserQueueState:
+            return .makeEndpoint("/v1/queue/myQueueState")
         }
     }
     
@@ -30,7 +42,7 @@ extension Endpoint {
 
 extension URL {
     
-    static let baseURL = "http://api.sesac.co.kr:1207"
+    static let baseURL = "http://api.sesac.co.kr:1210"
     
     static func makeEndpoint(_ endpoint: String) -> URL {
         
