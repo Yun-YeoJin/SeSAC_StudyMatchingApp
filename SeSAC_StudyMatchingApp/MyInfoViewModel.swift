@@ -15,14 +15,19 @@ class MyInfoViewModel {
     
     let title = BehaviorRelay<[String]>(value: ["좋은 매너", "정확한 시간 약속", "빠른 응답", "친절한 성격", "능숙한 취미 실력", "유익한 시간"])
     
-    let searchAble = BehaviorRelay<Int>(value: 0)
+    let searchable = BehaviorRelay<Int>(value: 0)
     let gender = BehaviorRelay<Int>(value: 0)
     let study = BehaviorRelay<String>(value: "")
-    let searchAge = BehaviorRelay<[Int]>(value: [])
+    var searchAge = BehaviorRelay<[Int]>(value: [])
     
-    func userInfo(completion: @escaping (String, UserEnum) -> Void) {
+    let nickName = BehaviorRelay<String>(value: "")
+    let review = PublishRelay<[String]>() //초기값이 없을 수도 있어서
+    
+    
+    
+    func updateUserInfo(completion: @escaping (String, UserEnum) -> Void) {
         
-        APIService.shared.userMyPage(searchable: searchAble.value, ageMin: searchAge.value[0], ageMax: searchAge.value[1], gender: gender.value, study: study.value) { data, code in
+        APIService.shared.userMyPage(searchable: searchable.value, ageMin: searchAge.value[0], ageMax: searchAge.value[1], gender: gender.value, study: study.value) { data, code in
             switch code {
                 
             case .success:
@@ -42,7 +47,6 @@ class MyInfoViewModel {
                 completion("서버 에러", code)
             case .clientError:
                 completion("사용자 에러 발생", code)
-                
             default: completion("", code)
                 
             }
@@ -50,6 +54,7 @@ class MyInfoViewModel {
     }
     
     func withdrawUser(completion: @escaping (String, UserEnum) -> Void) {
+        
         APIService.shared.withdraw(completion: { data, code in
             switch code {
             case .success:
@@ -57,6 +62,8 @@ class MyInfoViewModel {
                 UserDefaults.standard.removeObject(forKey: "idToken")
                 UserDefaults.standard.removeObject(forKey: "secondRun")
                 UserDefaults.standard.removeObject(forKey: "FCMtoken")
+                UserDefaults.standard.removeObject(forKey: "authVerificationID")
+                UserDefaults.standard.removeObject(forKey: "credentialId")
                 
             case .firebaseTokenInvalid:
                 self.getFCMToken { message, code in
@@ -73,10 +80,45 @@ class MyInfoViewModel {
                 completion("서버 에러", code)
             case .clientError:
                 completion("사용자 에러 발생", code)
-                
             default: completion("", code)
             }
         })
+    }
+    
+    func getUserInfo(completion: @escaping (String, UserEnum) -> Void) {
+        
+        APIService.shared.getLogin(completion: { [self] data, code in
+            switch code {
+            case .success:
+                bindAPIData(data: data)
+                completion("", code)
+            case .firebaseTokenInvalid:
+                self.getFCMToken { message, statusCode in
+                    switch statusCode {
+                    case .success:
+                        completion("", code)
+                    default:
+                        completion(message, code)
+                    }
+                }
+            default:
+                completion("", code)
+            }
+        })
+    }
+    
+    func bindAPIData(data: User?) {
+        guard let data = data else { return }
+        
+        dump(data)
+        
+        nickName.accept(data.nick)
+        gender.accept(data.gender)
+        study.accept(data.study)
+        searchable.accept(data.searchable)
+        searchAge.accept([data.ageMin, data.ageMax])
+        review.accept(data.reviewedBefore)
+        
     }
     
     func getFCMToken(completion: @escaping (String, UserEnum) -> Void) {
@@ -89,6 +131,8 @@ class MyInfoViewModel {
             }
         }
     }
+    
+   
     
     
 }
