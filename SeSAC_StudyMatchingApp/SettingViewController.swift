@@ -9,10 +9,15 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import Toast
 
 final class SettingViewController: BaseViewController {
 
     let mainView = SettingView()
+    
+    let viewModel = SettingViewModel()
+    
+    var disposeBag = DisposeBag()
     
     override func loadView() {
         self.view = mainView
@@ -20,6 +25,8 @@ final class SettingViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        viewModel.getUserInfo { data, code in }
         
         self.navigationController?.navigationBar.topItem?.title = "내정보"
     }
@@ -57,7 +64,26 @@ extension SettingViewController: UITableViewDelegate, UITableViewDataSource {
         
         guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "SettingHeaderView") as? SettingHeaderView else { return UIView() }
         
-        headerView.button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        viewModel.nickName
+            .asObservable()
+            .map { text -> String? in
+                return Optional(text)
+            }
+            .bind(to: headerView.nickNameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        let tapRecognizer = UITapGestureRecognizer()
+        tapRecognizer.numberOfTapsRequired = 1
+        tapRecognizer.numberOfTouchesRequired = 1
+        headerView.addGestureRecognizer(tapRecognizer)
+        
+        tapRecognizer.rx.event
+            .asDriver()
+            .drive { [self] _ in
+                self.transition(MyInfoViewController(), transitionStyle: .push)
+            }
+            .disposed(by: disposeBag)
+
         
         return headerView
         
@@ -68,7 +94,7 @@ extension SettingViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     @objc func buttonTapped() {
-        self.transition(MyInfoViewController(), transitionStyle: .push)
+        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

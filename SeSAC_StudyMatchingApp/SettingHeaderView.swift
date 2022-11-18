@@ -26,11 +26,11 @@ class SettingHeaderView: UITableViewHeaderFooterView {
     }
     
     let button = UIButton().then {
-        $0.setImage(UIImage(systemName: "chevron.compact.right"), for: .normal)
+        $0.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
         $0.backgroundColor = .clear
         $0.tintColor = .gray7
     }
-    
+
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         
@@ -68,8 +68,8 @@ class SettingHeaderView: UITableViewHeaderFooterView {
         button.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(22.5)
             make.centerY.equalToSuperview()
-            make.width.equalTo(9)
-            make.height.equalTo(18)
+            make.width.equalTo(22)
+            make.height.equalTo(44)
         }
     }
 }
