@@ -7,13 +7,17 @@
 
 import UIKit
 
-import RxCocoa
-import RxSwift
 import SnapKit
 import Then
 
 final class MyInfoView: BaseView {
- 
+    
+
+    let scrollView = UIScrollView().then {
+        $0.backgroundColor = .systemBackground
+        $0.showsVerticalScrollIndicator = true
+    }
+    
     let cardView = CardView()
     
     let userGenderView = UserGenderView()
@@ -21,8 +25,8 @@ final class MyInfoView: BaseView {
     let phoneSearchView = PhoneSearchView()
     let friendAgeView = FriendAgeView()
     let withdrawView = WithDrawView()
-
-    let stackView = UIStackView().then {
+    
+    let stackView = UIStackView().then { // contentsView
         $0.axis = .vertical
         $0.distribution = .fill
     }
@@ -30,31 +34,43 @@ final class MyInfoView: BaseView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        
     }
     
     override func configureUI() {
         
+        self.addSubview(scrollView)
+        
         [cardView, stackView].forEach {
-            self.addSubview($0)
-            
-            [userGenderView, favoriteStudyView, phoneSearchView, friendAgeView, withdrawView].forEach {
-                stackView.addArrangedSubview($0)
-            }
+            scrollView.addSubview($0)
         }
+        
+        [userGenderView, favoriteStudyView, phoneSearchView, friendAgeView, withdrawView].forEach {
+            stackView.addArrangedSubview($0)
+        }
+        
         
     }
     
     override func setConstraints() {
         
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalTo(self)
+        }
+        
         cardView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(self.safeAreaLayoutGuide).offset(16)
-            make.height.greaterThanOrEqualTo(250)
+            make.top.equalTo(scrollView)
+            make.leading.equalTo(scrollView).inset(16)
+            make.trailing.equalTo(scrollView).inset(16)
+            make.height.greaterThanOrEqualTo(252)
+            make.width.equalTo(UIScreen.main.bounds.width - 32)
         }
         
         stackView.snp.makeConstraints { make in
-            make.top.equalTo(cardView.snp.bottom).offset(0)
-            make.leading.trailing.equalTo(safeAreaLayoutGuide)
+            make.top.equalTo(cardView.snp.bottom).offset(10)
+            make.leading.equalTo(scrollView).inset(16)
+            make.trailing.equalTo(scrollView).inset(16)
+            make.bottom.equalTo(scrollView)
         }
         
         userGenderView.snp.makeConstraints { make in
@@ -75,9 +91,8 @@ final class MyInfoView: BaseView {
         }
         withdrawView.snp.makeConstraints { make in
             make.top.equalTo(friendAgeView.snp.bottom)
-            make.height.equalTo(60)
+            make.height.equalTo(90)
         }
         
-       
     }
 }
