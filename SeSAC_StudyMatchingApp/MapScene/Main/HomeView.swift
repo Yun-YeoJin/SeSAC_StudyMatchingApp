@@ -69,7 +69,6 @@ final class HomeView: BaseView {
         super.init(frame: frame)
         
         
-        
     }
     
     override func configureUI() {
@@ -111,8 +110,8 @@ final class HomeView: BaseView {
         
         centerLocationView.snp.makeConstraints { make in
             make.centerX.equalTo(mapKit)
-            make.centerY.equalTo(mapKit).offset(-24)
-            make.size.equalTo(48)
+            make.centerY.equalTo(mapKit).offset(24)
+            make.size.equalTo(45)
         }
         
         

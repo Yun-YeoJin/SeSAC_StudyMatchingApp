@@ -44,12 +44,18 @@ final class HomeViewController: BaseViewController {
         locationManagerSetting()
         mapKitSetting()
         
-        
     }
     
     override func configureUI() {
         
         mainView.myLocationButton.addTarget(self, action: #selector(myLocationButtonClicked), for: .touchUpInside)
+        mainView.floatingButton.addTarget(self, action: #selector(floatingButtonClicked), for: .touchUpInside)
+        
+    }
+    
+    @objc func floatingButtonClicked() {
+        
+        transition(KeyWordViewController(), transitionStyle: .push)
         
     }
     
