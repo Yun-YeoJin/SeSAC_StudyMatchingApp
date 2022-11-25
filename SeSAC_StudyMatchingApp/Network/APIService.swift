@@ -28,13 +28,14 @@ enum UserEnum: Int {
     case clientError = 501 //클라이언트 에러
 }
 
-// MARK: - API 요청하기 (Login / MyPage)
+
 class APIService {
    
     static let shared = APIService()
     
     var disposeBag = DisposeBag()
     
+    // MARK: - API 요청하기 (Login / MyPage)
     func getLogin(completion: @escaping (User?, UserEnum) -> Void) {
         
         let headers: HTTPHeaders = [
@@ -69,6 +70,8 @@ class APIService {
             "email": email,
             "gender": gender
         ]
+        
+        dump(parameters)
         
         RxAlamofire.requestData(.post, Endpoint.register.url, parameters: parameters, headers: headers)
             .subscribe{ (header, data) in
@@ -116,8 +119,59 @@ class APIService {
                 completion(apiState)
             }
             .disposed(by: disposeBag)
+        
     }
     
+    func userMyPage(searchable: Int, ageMin: Int, ageMax: Int, gender: Int, study: String, completion: @escaping (User?, UserEnum) -> Void) {
+       
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/x-www-form-urlencoded",
+            "idtoken": UserDefaultsRepository.fetchUserIDToken()
+        ]
+        
+        let parameters: [String: Any] = [
+            "searchable": searchable,
+            "ageMin": ageMin,
+            "ageMax": ageMax,
+            "gender": gender,
+            "study": study
+        ]
+        
+        dump(parameters)
+        
+        RxAlamofire.requestData(.put, Endpoint.userMyPage.url, parameters: parameters, headers: headers)
+            .subscribe{ (header, data) in
+                let apiState = UserEnum(rawValue: header.statusCode)!
+
+                let decodedData = try? JSONDecoder().decode(User.self, from: data)
+
+                completion(decodedData, apiState)
+            }
+            .disposed(by: disposeBag)
+    }
     
+    //MARK: Queue
+    func requestSearchUser(long: Double, lat: Double, studylist: String, completion: @escaping (User?, UserEnum) -> Void) {
+        
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/x-www-form-urlencoded",
+            "idtoken": UserDefaultsRepository.fetchUserIDToken()
+        ]
+        
+        let parameters: [String: Any] = [
+            "long": long,
+            "lat": lat,
+            "studylist": studylist
+        ]
+        
+        RxAlamofire.requestData(.post, Endpoint.requestSearchUser.url, parameters: parameters, headers: headers)
+            .subscribe{ (header, data) in
+                let apiState = UserEnum(rawValue: header.statusCode)!
+                let decodedData = try? JSONDecoder().decode(User.self, from: data)
+                
+                completion(decodedData, apiState)
+            }
+            .disposed(by: disposeBag)
+    }
 }
 
