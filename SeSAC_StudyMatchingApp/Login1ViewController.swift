@@ -32,6 +32,11 @@ final class Login1ViewController: BaseViewController {
         
     }
     
+    override func configureUI() {
+    
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+    }
+    
     private func checkSecondRun() {
         
         if  UserDefaultsRepository.fetchSecondRun() == false {

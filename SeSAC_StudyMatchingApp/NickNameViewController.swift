@@ -18,12 +18,6 @@ final class NickNameViewController: BaseViewController {
     
     var disposeBag = DisposeBag()
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        disposeBag = DisposeBag()
-    }
-    
     override func loadView() {
         self.view = mainView
     }
@@ -43,7 +37,7 @@ final class NickNameViewController: BaseViewController {
         backBarButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
-            }.disposed(by: disposebag)
+            }.disposed(by: disposeBag)
         
     }
     
@@ -73,7 +67,9 @@ final class NickNameViewController: BaseViewController {
             .bind { value in
                 if self.viewModel.isValid.value {
                     self.navigationController?.pushViewController(BirthViewController(), animated: true)
-                } else {
+                    UserDefaultsRepository.saveNickname(nickname: self.mainView.nickNameTextField.text!)
+
+                } else { // 닉네임 조건 오류
                     self.view.makeToast("닉네임은 1자 이상 10자 이내만 가능합니다.", position: .top)
                 }
             }

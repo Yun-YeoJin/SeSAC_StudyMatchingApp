@@ -59,15 +59,15 @@ final class UserDefaultsRepository {
    
     
     static func fetchAuthVerificationID() -> String {
-        return UserDefaults.standard.string(forKey: UserDefaultKey.authVerificationID)!
+        return UserDefaults.standard.string(forKey: UserDefaultKey.authVerificationID) ?? ""
     }
     
     static func fetchCredentialIdForFirebase() -> String {
-        return UserDefaults.standard.string(forKey: UserDefaultKey.credentialId)!
+        return UserDefaults.standard.string(forKey: UserDefaultKey.credentialId) ?? ""
     }
     
     static func fetchFCMToken() -> String {
-        return UserDefaults.standard.string(forKey: UserDefaultKey.fcmToken)!
+        return UserDefaults.standard.string(forKey: UserDefaultKey.fcmToken) ?? ""
     }
     
     static func fetchPhoneNumber() -> String {
@@ -91,7 +91,7 @@ final class UserDefaultsRepository {
     }
 
     static func fetchUserIDToken() -> String {
-        return UserDefaults.standard.string(forKey: UserDefaultKey.idToken)!
+        return UserDefaults.standard.string(forKey: UserDefaultKey.idToken) ?? ""
     }
 
 }

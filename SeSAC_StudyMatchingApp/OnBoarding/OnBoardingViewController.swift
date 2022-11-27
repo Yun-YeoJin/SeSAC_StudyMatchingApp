@@ -41,7 +41,7 @@ final class OnBoardingViewController: BaseViewController {
     @objc func startButtonClicked() {
         
         self.dismiss(animated: true)
-        UserDefaults.standard.set(true, forKey: "SecondRun")
+        UserDefaultsRepository.checkSecondRun(check: true)
         
     }
     
@@ -93,4 +93,5 @@ extension OnBoardingViewController: UIScrollViewDelegate {
         let index = Int(scrollView.contentOffset.x / self.mainView.collectionView.bounds.width)
         mainView.pageControl.currentPage = index
     }
+    
 }

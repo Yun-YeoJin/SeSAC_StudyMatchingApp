@@ -12,7 +12,7 @@ import Pageboy
 
 final class TabBarViewController: TabmanViewController {
     
-    private var vc = [MainViewController(), ShopViewController(), FriendsViewController(), ProfileViewController()]
+    private var vc = [HomeViewController(), ShopViewController(), FriendsViewController(), SettingViewController()]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,10 +26,10 @@ final class TabBarViewController: TabmanViewController {
             button.tintColor = .gray6
             button.selectedTintColor = .green
         }
-        bar.layout.transitionStyle = .snap // Customize
-        
+        bar.layout.transitionStyle = .none // Customize
         // Add to view
         addBar(bar, dataSource: self, at: .bottom)
+   
     }
 }
 
@@ -58,9 +58,10 @@ extension TabBarViewController: PageboyViewControllerDataSource, TMBarDataSource
             let title = "Page \(index)"
             return TMBarItem(title: title)
         }
-        
-      
+    
     }
     
 }
+
+
 

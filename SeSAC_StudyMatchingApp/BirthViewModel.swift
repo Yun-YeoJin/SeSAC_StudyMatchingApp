@@ -23,6 +23,7 @@ class BirthViewModel {
     let today = DateFormat(date: Date(), formatString: nil)
     
     func checkValidDate(date: Date) -> Bool {
+        
         inputDate.date = date
         birth.value = date
         

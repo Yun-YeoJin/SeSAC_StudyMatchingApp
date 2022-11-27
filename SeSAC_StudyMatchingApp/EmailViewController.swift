@@ -55,8 +55,7 @@ final class EmailViewController: BaseViewController {
                 if self.viewModel.isValid.value {
                     self.navigationController?.pushViewController(GenderViewController(), animated: true)
                     UserDefaultsRepository.saveEmail(email: self.mainView.emailTextField.text!)
-                    print(UserDefaults.standard.string(forKey: "email"))
-                } else {
+                } else { //이메일 유효성 오류
                     self.view.makeToast("이메일 형식이 올바르지 않습니다.", position: .top)
                 }
             }
@@ -71,7 +70,7 @@ final class EmailViewController: BaseViewController {
         backBarButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
-            }.disposed(by: disposebag)
+            }.disposed(by: disposeBag)
         
     }
     

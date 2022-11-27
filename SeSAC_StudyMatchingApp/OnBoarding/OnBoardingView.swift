@@ -25,10 +25,9 @@ final class OnBoardingView: BaseView {
         $0.currentPageIndicatorTintColor = .green
     }
     
-    let startButton = UIButton().then {
+    let startButton = CustomButton().then {
         $0.setTitle("시작하기", for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.backgroundColor = .green
+        $0.buttonState = .fill
     }
     
     override init(frame: CGRect) {
@@ -52,13 +51,12 @@ final class OnBoardingView: BaseView {
         collectionView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(8)
             make.top.equalToSuperview().inset(116)
-            make.width.equalTo(340)
-            make.height.equalTo(500)
+            make.height.equalToSuperview().multipliedBy(0.5)
         }
         
         pageControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(140)
+            make.bottom.equalTo(startButton.snp.top).multipliedBy(0.95)
         }
         
         startButton.snp.makeConstraints { make in

@@ -16,7 +16,7 @@ final class GenderViewController: BaseViewController {
     
     let viewModel = GenderViewModel()
     
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     override func loadView() {
         self.view = mainView
@@ -37,7 +37,7 @@ final class GenderViewController: BaseViewController {
         backBarButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
-            }.disposed(by: disposebag)
+            }.disposed(by: disposeBag)
         
     }
     
@@ -46,15 +46,17 @@ final class GenderViewController: BaseViewController {
         mainView.maleButton.rx.tap
             .withUnretained(self)
             .subscribe { vc, _ in
-                vc.viewModel.genderButtonObserver.accept(1) //왜 자꾸 0이 저장되는거지
+                vc.viewModel.genderButtonObserver.accept(1)
+                UserDefaultsRepository.saveGender(gender: self.viewModel.genderButtonObserver.value)
                 vc.mainView.maleButton.backgroundColor = .whiteGreen
                 vc.mainView.femaleButton.backgroundColor = .clear
-            }.disposed(by: disposebag)
+            }.disposed(by: disposeBag)
         
         mainView.femaleButton.rx.tap
             .withUnretained(self)
             .subscribe { vc, _ in
                 vc.viewModel.genderButtonObserver.accept(0)
+                UserDefaultsRepository.saveGender(gender: self.viewModel.genderButtonObserver.value)
                 vc.mainView.maleButton.backgroundColor = .clear
                 vc.mainView.femaleButton.backgroundColor = .whiteGreen
             }.disposed(by: disposeBag)
@@ -77,7 +79,6 @@ final class GenderViewController: BaseViewController {
         mainView.nextButton.rx.tap
             .bind {
                 if self.viewModel.isValid.value {
-                    UserDefaultsRepository.saveGender(gender: self.viewModel.genderButtonObserver.value)
                     self.register()
                 } else {
                     self.view.makeToast("회원가입이 불가해요!")

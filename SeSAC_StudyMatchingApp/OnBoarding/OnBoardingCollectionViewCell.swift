@@ -13,12 +13,12 @@ import Then
 final class OnBoardingCollectionViewCell: BaseCollectionViewCell {
     
     let textImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFill
+        $0.contentMode = .scaleAspectFit
         $0.backgroundColor = .clear
     }
     
     let onboardingImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
+        $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .clear
     }
     
@@ -46,7 +46,7 @@ final class OnBoardingCollectionViewCell: BaseCollectionViewCell {
         onboardingImageView.snp.makeConstraints { make in
             make.top.equalTo(textImageView.snp.bottom).offset(50)
             make.leading.trailing.equalToSuperview().inset(8)
-            make.width.height.equalTo(360)
+            make.height.equalToSuperview().multipliedBy(0.75)
         }
     }
     

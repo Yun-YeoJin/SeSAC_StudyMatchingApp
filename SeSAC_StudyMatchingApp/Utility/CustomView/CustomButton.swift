@@ -44,21 +44,23 @@ final class CustomButton: UIButton {
         layer.borderColor = UIColor.white.cgColor
 
         switch buttonState {
+            
         case .inactive:
-            self.layer.borderColor = UIColor.gray4.cgColor
+            layer.borderColor = UIColor.gray4.cgColor
             setTitleColor(.black, for: .normal)
         case .fill:
             tintColor = .white
             setTitleColor(.white, for: .normal)
             backgroundColor = .green
         case .outline:
-            self.layer.borderColor = UIColor.green.cgColor
+            layer.borderColor = UIColor.green.cgColor
             tintColor = .green
         case .cancel:
             backgroundColor = .gray2
         case .disable:
             tintColor = .gray3
             backgroundColor = .gray6
+            setTitleColor(.white, for: .normal)
         case .base:
             setTitleColor(.black, for: .normal)
         case .request:

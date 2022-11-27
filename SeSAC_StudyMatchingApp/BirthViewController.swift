@@ -32,7 +32,7 @@ final class BirthViewController: BaseViewController {
         backBarButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
-            }.disposed(by: disposebag)
+            }.disposed(by: disposeBag)
         
     }
     
@@ -82,7 +82,8 @@ final class BirthViewController: BaseViewController {
                 } else {
                     if self.viewModel.isValid.value {
                         self.navigationController?.pushViewController(EmailViewController(), animated: true)
-                    } else {
+            
+                    } else { //생년월일 조건 오류
                         self.view.makeToast("새싹 스터디는 만 17세 이상만 사용할 수 있습니다.", position: .top)
                     }
                 }

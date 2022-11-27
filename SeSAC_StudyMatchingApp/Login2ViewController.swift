@@ -86,6 +86,7 @@ final class Login2ViewController: BaseViewController {
             .bind(onNext: { [self] value in
                 if viewModel.validNum.value == true {
                     checkValidateFirebaseAuthAndGetIdtoken()
+                    view.makeToast("인증에 성공했습니다.", position: .top)
                 } else {
                     view.makeToast("잘못된 인증번호 입니다.", position: .top)
                 }
@@ -101,7 +102,7 @@ final class Login2ViewController: BaseViewController {
         backBarButton.rx.tap
             .bind { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
-            }.disposed(by: disposebag)
+            }.disposed(by: disposeBag)
         
     }
     
@@ -116,12 +117,12 @@ extension Login2ViewController {
             switch code {
             case .success:
                 // 홈화면으로 이동
-                self.navigationController?.pushViewController(NickNameViewController(), animated: true)
+                self.transition(TabBarViewController(), transitionStyle: .presentFullNavigation)
             case .firebaseTokenInvalid:
                 self.refreshIDToken()
             case .userUnexist:
                 // 회원가입 화면으로 이동
-                self.navigationController?.pushViewController(NickNameViewController(), animated: true)
+                self.transition(NickNameViewController(), transitionStyle: .push)
             default:
                 self.view.makeToast(message, position: .top)
             }
@@ -151,7 +152,6 @@ extension Login2ViewController {
         self.viewModel.checkValidate { message, status in
             switch status {
             case .success:
-                // 뷰이동
                 self.checkValidId()
             default:
                 self.view.makeToast(message, position: .top)
