@@ -7,11 +7,15 @@
 
 import UIKit
 
+import Alamofire
 import Firebase
 import FirebaseAuth
 import RxSwift
+import RxAlamofire
 
 final class FirebaseRepository {
+    
+    var disposeBag = DisposeBag()
     
     static let shared = FirebaseRepository()
     
@@ -83,6 +87,34 @@ final class FirebaseRepository {
             
             completion(.success)
         })
+    }
+    
+    func updateFCMToken(completion: @escaping (UserEnum) -> Void) {
+        
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/x-www-form-urlencoded",
+            "idtoken": UserDefaultsRepository.fetchUserIDToken()
+        ]
+        
+        let parameters: [String: Any] = [
+            "FCMtoken": UserDefaultsRepository.fetchFCMToken()
+        ]
+        
+        RxAlamofire.requestData(.put, Endpoint.updateFCMToken.url, parameters: parameters, headers: headers)
+            .subscribe{ (header, data) in
+                
+                let apiState = UserEnum(rawValue: header.statusCode)!
+                
+                if apiState == .firebaseTokenInvalid {
+                    self.getIdToken { code in
+                        print(code)
+                    }
+                }
+                
+                completion(apiState)
+            }
+            .disposed(by: disposeBag)
+        
     }
 
 }

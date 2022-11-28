@@ -8,6 +8,7 @@
 import Foundation
 
 import Alamofire
+import Firebase
 import RxAlamofire
 import RxSwift
 
@@ -82,28 +83,6 @@ class APIService {
             .disposed(by: disposeBag)
     }
     
-    func updateFCMToken(completion: @escaping (UserEnum) -> Void) {
-        
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/x-www-form-urlencoded",
-            "idtoken": UserDefaultsRepository.fetchUserIDToken()
-        ]
-        
-        let parameters: [String: Any] = [
-            "FCMtoken": UserDefaultsRepository.fetchFCMToken()
-        ]
-        
-        RxAlamofire.requestData(.put, Endpoint.updateFCMToken.url, parameters: parameters, headers: headers)
-            .subscribe{ (header, data) in
-                
-                let apiState = UserEnum(rawValue: header.statusCode)!
-                
-                completion(apiState)
-            }
-            .disposed(by: disposeBag)
-        
-    }
-    
     func userMyPage(searchable: Int, ageMin: Int, ageMax: Int, gender: Int, study: String, completion: @escaping (User?, UserEnum) -> Void) {
        
         let headers: HTTPHeaders = [
@@ -133,7 +112,7 @@ class APIService {
     }
     
     //MARK: Queue
-    func requestSearchUser(long: Double, lat: Double, studylist: String, completion: @escaping (Queue?, SearchQueueEnum) -> Void) {
+    func requestSearchUser(long: Double, lat: Double, studylist: [String], completion: @escaping (Queue?, SearchQueueEnum) -> Void) {
         
         let headers: HTTPHeaders = [
             "Content-Type": "application/x-www-form-urlencoded",
@@ -156,6 +135,22 @@ class APIService {
             .disposed(by: disposeBag)
     }
     
+    func deleteOnqueue(completion: @escaping (Queue?, SearchQueueEnum) -> Void) {
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/x-www-form-urlencoded",
+            "idtoken": UserDefaultsRepository.fetchUserIDToken()
+        ]
+        
+        RxAlamofire.requestData(.delete, Endpoint.cancelSearchUser.url, headers: headers)
+            .subscribe{ (header, data) in
+                let apiState = SearchQueueEnum(rawValue: header.statusCode)!
+                let decodedData = try? JSONDecoder().decode(Queue.self, from: data)
+                
+                completion(decodedData, apiState)
+            }
+            .disposed(by: disposeBag)
+    }
+    
     func searchNearSeSAC(long: Double, lat: Double, completion: @escaping (Queue?, SearchQueueEnum) -> Void) {
         
         let headers: HTTPHeaders = [
@@ -165,7 +160,7 @@ class APIService {
         
         let parameters: [String: Any] = [
             "long": long,
-            "lat": lat,
+            "lat": lat
         ]
         
         RxAlamofire.requestData(.post, Endpoint.searchSeSAC.url, parameters: parameters, headers: headers)
@@ -178,16 +173,16 @@ class APIService {
             .disposed(by: disposeBag)
     }
     
-    func checkMyQueueState(completion: @escaping (Queue?, QueueStateEnum) -> Void) {
+    func checkMyQueueState(completion: @escaping (Queue?, StudyAcceptEnum) -> Void) {
         
         let headers: HTTPHeaders = [
             "Content-Type": "application/x-www-form-urlencoded",
             "idtoken": UserDefaultsRepository.fetchUserIDToken()
         ]
         
-        RxAlamofire.requestData(.get, Endpoint.searchSeSAC.url, headers: headers)
+        RxAlamofire.requestData(.get, Endpoint.checkUserQueueState.url, headers: headers)
             .subscribe{ (header, data) in
-                let apiState = QueueStateEnum(rawValue: header.statusCode)!
+                let apiState = StudyAcceptEnum(rawValue: header.statusCode)!
                 let decodedData = try? JSONDecoder().decode(Queue.self, from: data)
                 
                 completion(decodedData, apiState)
@@ -195,7 +190,9 @@ class APIService {
             .disposed(by: disposeBag)
     }
     
-    func studyRequest(otheruid: String, completion: @escaping (Queue?, StudyRequestEnum) -> Void) {
+   
+    
+    func studyRequest(otheruid: String, completion: @escaping (Queue?, StudyAcceptEnum) -> Void) {
         
         let headers: HTTPHeaders = [
             "Content-Type": "application/x-www-form-urlencoded",
@@ -208,7 +205,7 @@ class APIService {
         
         RxAlamofire.requestData(.post, Endpoint.studyRequest.url, parameters: parameters, headers: headers)
             .subscribe{ (header, data) in
-                let apiState = StudyRequestEnum(rawValue: header.statusCode)!
+                let apiState = StudyAcceptEnum(rawValue: header.statusCode)!
                 let decodedData = try? JSONDecoder().decode(Queue.self, from: data)
                 
                 completion(decodedData, apiState)
