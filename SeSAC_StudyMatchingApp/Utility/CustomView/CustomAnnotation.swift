@@ -8,40 +8,34 @@
 import UIKit
 import MapKit
 
-class CustomAnnotationView: MKAnnotationView {
+class AnnotationPin: NSObject, MKAnnotation {
+    var title: String?
+    var subtitle: String?
+    var coordinate: CLLocationCoordinate2D
+    var image: SesacImage?
     
-    static let identifier = "CustomAnnotationView"
-    
-    override init(annotation: MKAnnotation?, reuseIdentifier: String?){
-        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
-        frame = CGRect(x: 0, y: 0, width: 40, height: 50)
-        centerOffset = CGPoint(x: 0, y: -frame.size.height / 2)
-        setupUI()
+    init(title: String, subtitle: String, coordinate: CLLocationCoordinate2D) {
+        self.title = title
+        self.subtitle = subtitle
+        self.coordinate = coordinate
+        self.image = .level1
+        super.init()
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupUI() {
-        backgroundColor = .clear
-    }
-    
 }
 
+class CustomAnnotation: MKAnnotationView {
+    static let identifier = "CustomAnnotationView"
+    
+    private let annotationFrame = CGRect(x: 0, y: 0, width: 40, height: 40)
 
-class CustomAnnotation: NSObject, MKAnnotation {
-  let sesac_image: Int?
-  let coordinate: CLLocationCoordinate2D
+    override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
+        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
+        
+        self.frame = annotationFrame
+        self.backgroundColor = .clear
+    }
 
-  init(
-    sesac_image: Int?,
-    coordinate: CLLocationCoordinate2D
-  ) {
-    self.sesac_image = sesac_image
-    self.coordinate = coordinate
-
-    super.init()
-  }
-
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) not implemented!")
+    }
 }
