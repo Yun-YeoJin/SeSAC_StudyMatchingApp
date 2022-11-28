@@ -73,3 +73,12 @@ enum StudyAcceptEnum: Int {
     case clientError = 501 //클라이언트 에러
     
 }
+
+enum GenderCase: Int {
+    case man = 1
+    case woman = 0
+    case unselected = -1
+    case all = 2
+}
+
+
