@@ -202,8 +202,9 @@ final class MyInfoViewController: BaseViewController {
                 switch code {
                 case .success:
                     let vc = OnBoardingViewController()
-                    vc.modalPresentationStyle = .fullScreen
-                    self.present(vc, animated: true, completion: nil)
+                    let nav = UINavigationController(rootViewController: vc)
+                    nav.modalPresentationStyle = .fullScreen // 풀스크린으로 설정
+                    self.present(nav, animated: true, completion: nil)
                 default:
                     self.view.makeToast("회원탈퇴에 실패했어요.")
                 }

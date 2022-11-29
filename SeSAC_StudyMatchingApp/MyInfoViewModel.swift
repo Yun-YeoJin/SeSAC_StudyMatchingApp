@@ -122,7 +122,7 @@ class MyInfoViewModel {
     }
     
     func getFCMToken(completion: @escaping (String, UserEnum) -> Void) {
-        APIService.shared.updateFCMToken { status in
+        FirebaseRepository.shared.updateFCMToken { status in
             switch status {
             case .serverError:
                 completion("에러가 발생했습니다. 잠시 후 다시 시도해주세요.", status)
