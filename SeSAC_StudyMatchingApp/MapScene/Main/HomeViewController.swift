@@ -10,24 +10,36 @@ import UIKit
 import CoreLocation
 import MapKit
 import Toast
+import RxCocoa
+import RxSwift
 
 final class HomeViewController: BaseViewController {
     
     private let locationManager = CLLocationManager()
     
-    var lat: Double = 37.517829 //새싹 영등포 캠퍼스 주소를 Default로 하겠다.
-    var lon: Double = 126.886270
-    
     var myLocation: CLLocation!
     
-    private var sesacCampusLocation = CLLocationCoordinate2D(latitude: 37.517819364682694, longitude: 126.88647317074734)
+    private var sesacCampusLocation = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.517819364682694, longitude: 126.88647317074734), span: MKCoordinateSpan(latitudeDelta: 0.0005, longitudeDelta: 0.0005))
+    
+    var currentLocation: CLLocation?
     
     let mainView = HomeView()
     
     let viewModel = HomeViewModel()
     
+    var disposeBag = DisposeBag()
+    
+    var gender: GenderCase = .all
+    
     override func loadView() {
         self.view = mainView
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        locationManager.stopUpdatingLocation()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -36,13 +48,14 @@ final class HomeViewController: BaseViewController {
         self.navigationController?.navigationBar.topItem?.title = ""
     }
     
-   
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        
         locationManagerSetting()
-        mapKitSetting()
+        moveLocation(latitudeValue: viewModel.lat.value, longtudeValue: viewModel.long.value, delta: 0.005)
+        mainView.mapKit.delegate = self
+        bindButton()
+        bindQueueData()
         
     }
     
@@ -50,23 +63,53 @@ final class HomeViewController: BaseViewController {
         
         mainView.myLocationButton.addTarget(self, action: #selector(myLocationButtonClicked), for: .touchUpInside)
         mainView.floatingButton.addTarget(self, action: #selector(floatingButtonClicked), for: .touchUpInside)
+    
+    }
+    
+    func bindButton() {
+        
+        mainView.searchAllButton.rx.tap
+            .subscribe { [self] _ in
+                gender = .all
+                searchNearSeSAC()
+                mainView.searchAllButton.buttonState = .fill
+                mainView.searchManButton.buttonState = .inactive
+                mainView.searchWomanButton.buttonState = .inactive
+            }.disposed(by: disposeBag)
+        
+        mainView.searchManButton.rx.tap
+            .subscribe { [self] _ in
+                gender = .man
+                searchNearSeSAC()
+                mainView.searchAllButton.buttonState = .inactive
+                mainView.searchManButton.buttonState = .fill
+                mainView.searchWomanButton.buttonState = .inactive
+            }.disposed(by: disposeBag)
+        
+        mainView.searchWomanButton.rx.tap
+            .subscribe { [self] _ in
+                gender = .woman
+                searchNearSeSAC()
+                mainView.searchAllButton.buttonState = .inactive
+                mainView.searchManButton.buttonState = .inactive
+                mainView.searchWomanButton.buttonState = .fill
+            }.disposed(by: disposeBag)
         
     }
     
     @objc func floatingButtonClicked() {
         
+        searchNearSeSAC()
         transition(KeyWordViewController(), transitionStyle: .push)
-        
     }
     
     @objc func myLocationButtonClicked() {
         
-        guard let currentLocation = locationManager.location else {
+        guard locationManager.location != nil else {
             locationManager.requestWhenInUseAuthorization()
             showRequestLocationServiceAlert()
             return
         }
-        
         mainView.mapKit.showsUserLocation = true
         mainView.mapKit.setUserTrackingMode(.follow, animated: true)
         
@@ -82,17 +125,11 @@ final class HomeViewController: BaseViewController {
         myLocation = locationManager.location
     }
     
-    private func mapKitSetting() {
-        
-        mainView.mapKit.setRegion(MKCoordinateRegion(center: sesacCampusLocation, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)), animated: true) // 현재 지도 상태를 set(위치, 축척)
-        
-        mainView.mapKit.delegate = self
-        
-    }
-
+  
+    
 }
 
-extension HomeViewController: CLLocationManagerDelegate {
+extension HomeViewController: MKMapViewDelegate, CLLocationManagerDelegate {
     
     // MARK: iOS 버전에 따른 분기 처리와 iOS 위치 서비스 여부 확인
     func checkUserLocationServiceAuthoriztaion() {
@@ -116,15 +153,13 @@ extension HomeViewController: CLLocationManagerDelegate {
         
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func moveLocation(latitudeValue: CLLocationDegrees, longtudeValue: CLLocationDegrees, delta span: Double) {
         
-        if let coordinate = locations.last?.coordinate {
-            lat = coordinate.latitude
-            lon = coordinate.longitude
-            
-            sesacCampusLocation = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        }
-        locationManager.stopUpdatingLocation()
+        let pLocation = CLLocationCoordinate2DMake(latitudeValue, longtudeValue)
+        let pSpanValue = MKCoordinateSpan(latitudeDelta: span, longitudeDelta: span)
+        let pRegion = MKCoordinateRegion(center: pLocation, span: pSpanValue)
+        
+        mainView.mapKit.setRegion(pRegion, animated: true)
     }
     
     func checkUserLocationServicesAuthorization() {
@@ -172,9 +207,9 @@ extension HomeViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         checkUserLocationServicesAuthorization()
     }
-        
     
-        
+    
+    
     func showRequestLocationServiceAlert() {
         let requestLocationServiceAlert = UIAlertController(title: "위치정보 이용", message: "위치 서비스를 사용할 수 없습니다. 기기의 '설정>개인정보 보호'에서 위치 서비스를 켜주세요.", preferredStyle: .alert)
         let goSetting = UIAlertAction(title: "설정으로 이동", style: .destructive) { _ in
@@ -190,21 +225,78 @@ extension HomeViewController: CLLocationManagerDelegate {
         
         present(requestLocationServiceAlert, animated: true, completion: nil)
     }
-}
-
-extension HomeViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         
         print(#function)
         
-        let lat = mainView.mapKit.centerCoordinate.latitude
-        let long = mainView.mapKit.centerCoordinate.longitude
+        viewModel.lat.accept(mapView.centerCoordinate.latitude)
+        viewModel.long.accept(mapView.centerCoordinate.longitude)
+        searchNearSeSAC()
         
-        viewModel.calculateRegion(lat: lat, long: long)
-        
+        findAddress(lat: mapView.centerCoordinate.latitude, long: mapView.centerCoordinate.longitude) { [self] address in
+            bindQueueData()
+            mapView.markAnnotation(mapView.centerCoordinate, region: false)
+        }
     }
     
+    func bindQueueData() {
+        viewModel.data
+            .subscribe(onNext: { [self] data in
+                mainView.mapKit.removeAnnotations(mainView.mapKit.annotations)
+                mainView.mapKit.markFriendsAnnotation(data.fromQueueDB, filter: gender)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        let annotationView = CustomAnnotation()
+        var annotationimageView = UIImageView()
+        var image = UIImage()
+        
+        if annotation.title == "my" {
+            annotationimageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+            image = UIImage(named: "map_marker")!
+        } else {
+            annotationimageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 84, height: 84))
+            image = (SesacImage(index: Int(annotation.subtitle! ?? "0")!)?.pageIconImage())!
+        }
+        
+        annotationimageView.image = image
+        annotationView.addSubview(annotationimageView)
+        annotationView.annotation = annotation
+        
+        return annotationView
+    }
+    
+    // 주소 찾기
+    func findAddress(lat: CLLocationDegrees, long: CLLocationDegrees, completion: @escaping (String) -> ()) {
+        let findLocation = CLLocation(latitude: lat, longitude: long)
+        let geocoder = CLGeocoder()
+        let locale = Locale(identifier: "Ko-kr") //원하는 언어의 나라 코드를 넣어주시면 됩니다.
+        
+        geocoder.reverseGeocodeLocation(findLocation, preferredLocale: locale, completionHandler: {(placemarks, error) in
+            if let address: [CLPlacemark] = placemarks {
+                if let name: String = address.last?.name {
+                    completion(name)
+                } //전체 주소
+            }
+        })
+    }
+    
+    func searchNearSeSAC() {
+        viewModel.caculateRegion()
+        viewModel.searchNearSeSAC { [self] message, code in
+            switch code {
+            case .userUnexist:
+                self.view.makeToast("사용자가 없습니다.")
+            default:
+                self.view.makeToast("\(code)")
+            }
+        }
+    }
 }
+
 
 

@@ -15,9 +15,9 @@ final class HomeView: BaseView {
     
     let mapKit = MKMapView().then {
         $0.mapType = MKMapType.standard
-        $0.showsUserLocation = true
         $0.setUserTrackingMode(.follow, animated: true)
-        $0.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 500, maxCenterCoordinateDistance: 30000)
+        $0.isZoomEnabled = true
+        $0.isRotateEnabled = false
     }
     
     let genderButtonStackView = UIStackView().then {
@@ -32,6 +32,7 @@ final class HomeView: BaseView {
         $0.buttonState = .fill
         $0.titleLabel?.font = .title3_M14
         $0.layer.cornerRadius = 0
+        $0.tag = GenderCase.all.rawValue
     }
     
     let searchManButton = CustomButton().then {
@@ -39,6 +40,7 @@ final class HomeView: BaseView {
         $0.buttonState = .inactive
         $0.titleLabel?.font = .title3_M14
         $0.layer.cornerRadius = 0
+        $0.tag = GenderCase.man.rawValue
     }
     
     let searchWomanButton = CustomButton().then {
@@ -46,10 +48,7 @@ final class HomeView: BaseView {
         $0.buttonState = .inactive
         $0.titleLabel?.font = .title3_M14
         $0.layer.cornerRadius = 0
-    }
-    
-    let centerLocationView = UIImageView().then {
-        $0.image = UIImage(named: "map_marker")
+        $0.tag = GenderCase.woman.rawValue
     }
     
     let floatingButton = UIButton().then {
@@ -73,7 +72,7 @@ final class HomeView: BaseView {
     
     override func configureUI() {
         
-        [mapKit,genderButtonStackView, centerLocationView, floatingButton, myLocationButton].forEach {
+        [mapKit,genderButtonStackView, floatingButton, myLocationButton].forEach {
             self.addSubview($0)
             
             [searchAllButton, searchManButton, searchWomanButton].forEach {
@@ -106,12 +105,6 @@ final class HomeView: BaseView {
             make.top.equalTo(genderButtonStackView.snp.bottom).offset(16)
             make.leading.equalTo(self.safeAreaLayoutGuide).inset(16)
             make.size.equalTo(48)
-        }
-        
-        centerLocationView.snp.makeConstraints { make in
-            make.centerX.equalTo(mapKit)
-            make.centerY.equalTo(mapKit).offset(24)
-            make.size.equalTo(45)
         }
         
         
