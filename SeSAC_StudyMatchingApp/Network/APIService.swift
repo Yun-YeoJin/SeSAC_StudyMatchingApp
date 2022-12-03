@@ -120,12 +120,12 @@ class APIService {
         ]
         
         let parameters: [String: Any] = [
-            "long": long,
             "lat": lat,
+            "long": long,
             "studylist": studylist
         ]
         
-        RxAlamofire.requestData(.post, Endpoint.requestSearchUser.url, parameters: parameters, headers: headers)
+        RxAlamofire.requestData(.post, Endpoint.requestSearchUser.url, parameters: parameters, encoding: URLEncoding(arrayEncoding: .noBrackets), headers: headers)
             .subscribe{ (header, data) in
                 let apiState = SearchQueueEnum(rawValue: header.statusCode)!
                 let decodedData = try? JSONDecoder().decode(Queue.self, from: data)
@@ -159,8 +159,8 @@ class APIService {
         ]
         
         let parameters: [String: Any] = [
-            "long": long,
-            "lat": lat
+            "lat": lat,
+            "long": long
         ]
         
         RxAlamofire.requestData(.post, Endpoint.searchSeSAC.url, parameters: parameters, headers: headers)
