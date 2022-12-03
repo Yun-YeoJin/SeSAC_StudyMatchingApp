@@ -12,10 +12,6 @@ import SnapKit
 
 final class KeyWordView: BaseView {
     
-    let searchBar = UISearchBar().then {
-        $0.placeholder = "띄어쓰기로 복수 입력이 가능해요"
-    }
-    
     let backBarButton = UIBarButtonItem().then {
         $0.image = UIImage(systemName: "arrow.left")
         $0.tintColor = .black
@@ -27,6 +23,7 @@ final class KeyWordView: BaseView {
         layout.minimumInteritemSpacing = 8
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .systemBackground
+        view.isScrollEnabled = true
         view.showsVerticalScrollIndicator = false
         view.register(KeyWordCollectionViewCell.self, forCellWithReuseIdentifier: KeyWordCollectionViewCell.reuseIdentifier)
         view.register(KeyWordHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "KeyWordHeaderView")
@@ -44,7 +41,6 @@ final class KeyWordView: BaseView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
         
     }
     
@@ -68,29 +64,29 @@ final class KeyWordView: BaseView {
         }
         
     }
+}
+
+final class LeftAlignedCollectionViewFlowLayout: UICollectionViewFlowLayout {
     
-    private class LeftAlignedCollectionViewFlowLayout: UICollectionViewFlowLayout {
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         
-        override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-            
-            let attributes = super.layoutAttributesForElements(in: rect)
-            var leftMargin = sectionInset.left
-            var maxY: CGFloat = -1.0
-            
-            attributes?.forEach { layoutAttribute in
-                if layoutAttribute.representedElementCategory == .cell {
-                    
-                    if layoutAttribute.frame.origin.y >= maxY {
-                        leftMargin = sectionInset.left
-                    }
-                    
-                    layoutAttribute.frame.origin.x = leftMargin
-                    leftMargin += layoutAttribute.frame.width + minimumInteritemSpacing
-                    maxY = max(layoutAttribute.frame.maxY, maxY)
-                    
+        let attributes = super.layoutAttributesForElements(in: rect)
+        var leftMargin = sectionInset.left
+        var maxY: CGFloat = -1.0
+        
+        attributes?.forEach { layoutAttribute in
+            if layoutAttribute.representedElementCategory == .cell {
+                
+                if layoutAttribute.frame.origin.y >= maxY {
+                    leftMargin = sectionInset.left
                 }
+                
+                layoutAttribute.frame.origin.x = leftMargin
+                leftMargin += layoutAttribute.frame.width + minimumInteritemSpacing
+                maxY = max(layoutAttribute.frame.maxY, maxY)
+                
             }
-            return attributes
         }
+        return attributes
     }
 }

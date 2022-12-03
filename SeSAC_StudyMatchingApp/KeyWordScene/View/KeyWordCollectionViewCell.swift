@@ -22,7 +22,6 @@ final class KeyWordCollectionViewCell: BaseCollectionViewCell {
     }
     
     let label = UILabel().then {
-        $0.text = "알고리즘"
         $0.textColor = .label
         $0.backgroundColor = .clear
         $0.numberOfLines = 0
