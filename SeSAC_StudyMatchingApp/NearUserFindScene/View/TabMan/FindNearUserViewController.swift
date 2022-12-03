@@ -62,13 +62,16 @@ final class FindNearUserViewController: TabmanViewController {
         backBarButton.target = self
         backBarButton.rx.tap
             .bind { [weak self] in
-                self?.navigationController?.popViewController(animated: true)
+                let vc = TabBarViewController()
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .fullScreen // 풀스크린으로 설정
+                self?.present(nav, animated: true, completion: nil)
             }.disposed(by: disposeBag)
         
         cancelSearchButton.target = self
         cancelSearchButton.rx.tap
             .bind { [weak self] in
-                let vc = HomeViewController()
+                let vc = TabBarViewController()
                 let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen // 풀스크린으로 설정
                 self?.present(nav, animated: true, completion: nil)

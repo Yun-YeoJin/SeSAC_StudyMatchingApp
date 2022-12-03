@@ -21,12 +21,24 @@ class SplashViewController: UIViewController {
                       self.splashImageView.alpha = 1
                       }, completion: { finished in
                           // 애니메이션이 종료되었을 때의 코드
-        
-                          let vc = Login1ViewController()
-                          let nav = UINavigationController(rootViewController: vc)
-                          nav.modalPresentationStyle = .fullScreen // 풀스크린으로 설정
-                          self.present(nav, animated: true, completion: nil)
-                          // 뷰가 등장하는 애니메이션 효과인 animated는 false로 설정
+//                          let vc = TabBarViewController()
+//                          let nav = UINavigationController(rootViewController: vc)
+//                          nav.modalPresentationStyle = .fullScreen // 풀스크린으로 설정
+//                          self.present(nav, animated: true, completion: nil)
+                          
+                          if UserDefaultsRepository.fetchUserIDToken() == "" {
+                              let vc = Login1ViewController()
+                              let nav = UINavigationController(rootViewController: vc)
+                              nav.modalPresentationStyle = .fullScreen // 풀스크린으로 설정
+                              self.present(nav, animated: true, completion: nil)
+                              // 뷰가 등장하는 애니메이션 효과인 animated는 false로 설정
+                          } else if UserDefaultsRepository.fetchUserIDToken() != "" {
+                              let vc = TabBarViewController()
+                              let nav = UINavigationController(rootViewController: vc)
+                              nav.modalPresentationStyle = .fullScreen // 풀스크린으로 설정
+                              self.present(nav, animated: true, completion: nil)
+                              // 뷰가 등장하는 애니메이션 효과인 animated는 false로 설정
+                          }
                       })
         
     }
