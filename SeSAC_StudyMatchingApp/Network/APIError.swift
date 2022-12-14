@@ -14,7 +14,19 @@ enum APIError: Error {
     case invalidData
 }
 
+enum SeSACError: Int, Error {
+    
+    case userExist = 201 //이미 존재하는 유저
+    case invalidNickname = 202 //사용할 수 없는 닉네임
+    case firebaseTokenInvalid = 401 //파이어베이스 토큰 에러
+    case userUnexist = 406 //미가입 회원
+    case serverError = 500 //서버 에러
+    case clientError = 501 //클라이언트 에러
+    
+}
+
 enum UserEnum: Int {
+    
     case success = 200 //회원가입 성공
     case userExist = 201 //이미 가입한 유저
     case invalidNickname = 202 //사용할 수 없는 닉네임
@@ -22,6 +34,7 @@ enum UserEnum: Int {
     case userUnexist = 406 //미가입 회원
     case serverError = 500 //서버 에러
     case clientError = 501 //클라이언트 에러
+    
 }
 
 enum SearchQueueEnum: Int {
@@ -74,11 +87,6 @@ enum StudyAcceptEnum: Int {
     
 }
 
-enum GenderCase: Int {
-    case man = 1
-    case woman = 0
-    case unselected = -1
-    case all = 2
-}
+
 
 

@@ -26,12 +26,10 @@ final class CheckNetworkConnection {
     }
     
     private init(){
-        print("init 호출")
         monitor = NWPathMonitor()
     }
     
     public func startMonitoring(){
-        print("startMonitoring 호출")
         monitor.start(queue: queue)
         monitor.pathUpdateHandler = { [weak self] path in
             print("path :\(path)")
@@ -49,13 +47,11 @@ final class CheckNetworkConnection {
     }
     
     public func stopMonitoring(){
-        print("stopMonitoring 호출")
         monitor.cancel()
     }
     
     
     private func getConenctionType(_ path: NWPath) {
-        print("getConenctionType 호출")
         if path.usesInterfaceType(.wifi) {
             connectionType = .wifi
             print("wifi에 연결")

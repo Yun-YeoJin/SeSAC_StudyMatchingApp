@@ -19,6 +19,7 @@ enum Endpoint {
     case studyAccept
     case dodge
     case review
+    case chat
 }
 
 extension Endpoint {
@@ -47,6 +48,8 @@ extension Endpoint {
             return .makeEndpoint("/v1/queue/dodge") //스터디 취소하기
         case .review:
             return .makeEndpoint("/v1/queue/rate/") //리뷰 등록하기
+        case .chat:
+            return .makeEndpoint("/v1/chat")
         }
     }
     
