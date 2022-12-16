@@ -7,58 +7,55 @@
 
 import UIKit
 
-import Tabman
-import Pageboy
-
-final class TabBarViewController: TabmanViewController {
-    
-    private var vc = [HomeViewController(), ShopViewController(), FriendsViewController(), SettingViewController()]
+//MARK: Tabman을 이용해서 TabBar 구성시 RootView 변경을 못시켜줘서 변경!
+final class TabBarViewController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.dataSource = self
-        let bar = TMBar.TabBar()
+        configureTabBar()
+        setupTabBarAppearence()
         
-        bar.backgroundColor = .systemBackground
-        bar.backgroundView.style = .blur(style: .regular)
-        bar.buttons.customize { (button) in
-            button.tintColor = .gray6
-            button.selectedTintColor = .green
-        }
-        bar.layout.transitionStyle = .none // Customize
-        // Add to view
-        addBar(bar, dataSource: self, at: .bottom)
+    }
    
-    }
-}
-
-extension TabBarViewController: PageboyViewControllerDataSource, TMBarDataSource {
     
-    func numberOfViewControllers(in pageboyViewController: PageboyViewController) -> Int {
-        return vc.count
-    }
-    
-    func viewController(for pageboyViewController: PageboyViewController, at index: PageboyViewController.PageIndex) -> UIViewController? {
-        return vc[index]
-    }
-    
-    func defaultPage(for pageboyViewController: PageboyViewController) -> PageboyViewController.Page? {
-        return nil
-    }
-    
-    func barItem(for bar: TMBar, at index: Int) -> TMBarItemable {
+    private func setupTabBar(viewController: UIViewController, title: String, image: String) -> UINavigationController {
         
-        switch index {
-        case 0: return TMBarItem(title: "홈", image: UIImage(named: "HomeGray")!, selectedImage: UIImage(named: "Home")!)
-        case 1: return TMBarItem(title: "새싹샵", image: UIImage(named: "ShopGray")!, selectedImage: UIImage(named: "Shop")!)
-        case 2: return TMBarItem(title: "새싹친구", image: UIImage(named: "FriendsGray")!, selectedImage: UIImage(named: "Friends")!)
-        case 3: return TMBarItem(title: "내정보", image: UIImage(named: "ProfileGray")!, selectedImage: UIImage(named: "Profile")!)
-        default:
-            let title = "Page \(index)"
-            return TMBarItem(title: title)
-        }
+        viewController.tabBarItem.title = title
+        viewController.tabBarItem.image = UIImage(named: image)
+     
+        let navigationViewController = UINavigationController(rootViewController: viewController)
+        return navigationViewController
+        
+    }
     
+    private func configureTabBar() {
+        
+        let homeVC = setupTabBar(viewController: HomeViewController(), title: "홈", image: TabImage.home)
+        
+        let shopVC = setupTabBar(viewController: ShopViewController(), title: "새싹샵", image: TabImage.shop)
+      
+        let friendVC = setupTabBar(viewController: FriendsViewController(), title: "새싹친구", image: TabImage.chat)
+        
+        let profileVC = setupTabBar(viewController: SettingViewController(), title: "내정보", image: TabImage.profile)
+
+        setViewControllers([homeVC, shopVC, friendVC, profileVC], animated: true)
+        
+    }
+    
+    private func setupTabBarAppearence() {
+        
+        let tabBarAppearance = UITabBarItemAppearance()
+        let appearance = UITabBarAppearance()
+        appearance.backgroundColor = .white
+        tabBarAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.green, NSAttributedString.Key.font: UIFont.title6_R12]
+        appearance.stackedLayoutAppearance = tabBarAppearance
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+   
+        tabBar.backgroundColor = .white
+        tabBar.tintColor = .green
+        
     }
     
 }
